@@ -1,0 +1,473 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-top-color: rgba(255, 255, 255, 1);
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 88, 190, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#f8f9ff",
+                      "error-container": "#ffdad6",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed-dim": "#d0bcff",
+                      "on-secondary": "#ffffff",
+                      "surface-container": "#e5eeff",
+                      "on-primary-container": "#fefcff",
+                      "surface-tint": "#005ac2",
+                      "surface-variant": "#d3e4fe",
+                      "on-secondary-fixed": "#23005c",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed": "#6ffbbe",
+                      "inverse-surface": "#213145",
+                      "surface": "#f8f9ff",
+                      "primary-fixed": "#d8e2ff",
+                      "on-error": "#ffffff",
+                      "surface-container-highest": "#d3e4fe",
+                      "primary": "#0058be",
+                      "secondary-fixed": "#e9ddff",
+                      "on-error-container": "#93000a",
+                      "inverse-primary": "#adc6ff",
+                      "on-primary-fixed-variant": "#004395",
+                      "primary-fixed-dim": "#adc6ff",
+                      "tertiary": "#006947",
+                      "surface-container-high": "#dce9ff",
+                      "surface-dim": "#cbdbf5",
+                      "on-primary-fixed": "#001a42",
+                      "outline": "#727785",
+                      "surface-container-low": "#eff4ff",
+                      "secondary-container": "#8455ef",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-container": "#f5fff6",
+                      "on-background": "#0b1c30",
+                      "secondary": "#6b38d4",
+                      "on-surface-variant": "#424754",
+                      "outline-variant": "#c2c6d6",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "on-secondary-container": "#fffbff",
+                      "on-surface": "#0b1c30",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-container": "#00855b",
+                      "primary-container": "#2170e4",
+                      "on-tertiary-fixed": "#002113",
+                      "surface-bright": "#f8f9ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "margin-desktop": "40px",
+                      "margin-mobile": "16px",
+                      "md": "16px",
+                      "gutter": "24px",
+                      "2xl": "48px",
+                      "sm": "8px",
+                      "3xl": "64px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "caption": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "body-lg": ["Plus Jakarta Sans"],
+                      "display-lg": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "label-md": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "caption": ["12px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Top Navigation Bar -->
+<nav class="bg-white/70 backdrop-blur-xl w-full sticky top-0 z-50 border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+<div class="flex justify-between items-center px-margin-desktop py-md w-full max-w-full mx-auto">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary">Weather</span>
+<div class="hidden md:flex gap-lg items-center">
+<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Map</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Alerts</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Locations</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative group hidden sm:block">
+<input class="bg-surface-container-low border-none rounded-full px-lg py-sm pl-xl focus:ring-2 focus:ring-primary/20 w-64 transition-all outline-none text-body-md" placeholder="Search cities..." type="text">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+</div>
+<button class="material-symbols-outlined text-primary p-sm hover:bg-primary/5 rounded-lg transition-all active:scale-95 duration-200 ease-in-out">account_circle</button>
+</div>
+</div>
+</nav>
+<main class="px-margin-desktop py-xl max-w-full mx-auto space-y-3xl">
+<!-- Hero Weather Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<div class="lg:col-span-8 glass-card rounded-3xl p-2xl flex flex-col md:flex-row items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.04)] relative overflow-hidden">
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-sm text-primary mb-sm">
+<span class="material-symbols-outlined">location_on</span>
+<span class="font-label-md text-label-md">SAN FRANCISCO, CA</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-xs">68°</h1>
+<p class="font-headline-md text-headline-md text-on-surface-variant">Cloudy</p>
+<div class="flex gap-md mt-lg">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary">arrow_upward</span>
+<span class="font-body-md text-body-md">72°</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary">arrow_downward</span>
+<span class="font-body-md text-body-md">59°</span>
+</div>
+</div>
+</div>
+<div class="relative z-10 w-full md:w-64 h-64 flex items-center justify-center">
+<!-- Dynamic weather visualization placeholder -->
+<div class="relative w-48 h-48 bg-surface-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[120px] text-primary/40" style="font-variation-settings: 'FILL' 1;">cloud</span>
+<div class="absolute inset-0 border-4 border-dashed border-primary/10 rounded-full animate-[spin_60s_linear_infinite]"></div>
+</div>
+</div>
+</div>
+<!-- Side Metric Summary -->
+<div class="lg:col-span-4 space-y-gutter">
+<div class="glass-card rounded-3xl p-lg h-full flex flex-col justify-between shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Air Quality</h3>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-sm py-xs rounded-full font-caption text-caption">Good</span>
+</div>
+<div class="space-y-md">
+<p class="font-headline-md text-headline-md">24 AQI</p>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[24%] h-full bg-tertiary rounded-full"></div>
+</div>
+<p class="font-caption text-caption text-on-surface-variant">Air quality is considered satisfactory, and air pollution poses little or no risk.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Hourly & Outlook Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- 24-Hour Forecast -->
+<div class="lg:col-span-8 glass-card rounded-3xl p-lg shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+<div class="flex items-center justify-between mb-xl">
+<h3 class="font-headline-md text-headline-md">24-Hour Forecast</h3>
+<button class="text-primary font-label-md text-label-md hover:underline">View Detailed</button>
+</div>
+<div class="flex gap-lg overflow-x-auto pb-md custom-scrollbar snap-x">
+<!-- Hourly Item 1 (Active) -->
+<div class="flex-shrink-0 w-24 p-md rounded-2xl bg-primary-container text-on-primary-container flex flex-col items-center gap-md snap-start">
+<span class="font-label-md text-label-md">Now</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">cloud</span>
+<span class="font-body-md text-body-md font-bold">68°</span>
+</div>
+<!-- Repeat Hourly Items -->
+<script>
+                        const hours = ['1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM'];
+                        const temps = ['69°', '71°', '72°', '71°', '69°', '66°', '64°', '62°', '61°', '60°'];
+                        const icons = ['partly_cloudy_day', 'sunny', 'sunny', 'partly_cloudy_day', 'cloud', 'cloud', 'cloudy_snowing', 'nights_stay', 'nights_stay', 'nights_stay'];
+                        
+                        hours.forEach((h, i) => {
+                            document.write(`
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">${h}</span>
+                                    <span class="material-symbols-outlined text-primary">${icons[i]}</span>
+                                    <span class="font-body-md text-body-md font-semibold">${temps[i]}</span>
+                                </div>
+                            `);
+                        });
+                    </script>
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">1 PM</span>
+                                    <span class="material-symbols-outlined text-primary">partly_cloudy_day</span>
+                                    <span class="font-body-md text-body-md font-semibold">69°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">2 PM</span>
+                                    <span class="material-symbols-outlined text-primary">sunny</span>
+                                    <span class="font-body-md text-body-md font-semibold">71°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">3 PM</span>
+                                    <span class="material-symbols-outlined text-primary">sunny</span>
+                                    <span class="font-body-md text-body-md font-semibold">72°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">4 PM</span>
+                                    <span class="material-symbols-outlined text-primary">partly_cloudy_day</span>
+                                    <span class="font-body-md text-body-md font-semibold">71°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">5 PM</span>
+                                    <span class="material-symbols-outlined text-primary">cloud</span>
+                                    <span class="font-body-md text-body-md font-semibold">69°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">6 PM</span>
+                                    <span class="material-symbols-outlined text-primary">cloud</span>
+                                    <span class="font-body-md text-body-md font-semibold">66°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">7 PM</span>
+                                    <span class="material-symbols-outlined text-primary">cloudy_snowing</span>
+                                    <span class="font-body-md text-body-md font-semibold">64°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">8 PM</span>
+                                    <span class="material-symbols-outlined text-primary">nights_stay</span>
+                                    <span class="font-body-md text-body-md font-semibold">62°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">9 PM</span>
+                                    <span class="material-symbols-outlined text-primary">nights_stay</span>
+                                    <span class="font-body-md text-body-md font-semibold">61°</span>
+                                </div>
+                            
+                                <div class="flex-shrink-0 w-24 p-md rounded-2xl hover:bg-white/50 transition-colors flex flex-col items-center gap-md snap-start">
+                                    <span class="font-label-md text-label-md text-on-surface-variant">10 PM</span>
+                                    <span class="material-symbols-outlined text-primary">nights_stay</span>
+                                    <span class="font-body-md text-body-md font-semibold">60°</span>
+                                </div>
+                            
+</div>
+</div>
+<!-- 7-Day Outlook -->
+<div class="lg:col-span-4 glass-card rounded-3xl p-lg shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+<h3 class="font-headline-md text-headline-md mb-xl">7-Day Outlook</h3>
+<div class="space-y-md">
+<script>
+                        const days = ['Today', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        const dayIcons = ['cloud', 'partly_cloudy_day', 'sunny', 'sunny', 'rainy', 'partly_cloudy_day', 'cloud'];
+                        const dayTemps = ['72 / 59', '74 / 60', '78 / 62', '80 / 65', '68 / 58', '70 / 59', '71 / 60'];
+                        
+                        days.forEach((d, i) => {
+                            document.write(`
+                                <div class="flex items-center justify-between p-sm rounded-xl hover:bg-white/40 transition-colors">
+                                    <span class="font-body-md text-body-md w-12">${d}</span>
+                                    <span class="material-symbols-outlined text-primary">${dayIcons[i]}</span>
+                                    <span class="font-body-md text-body-md text-right">${dayTemps[i]}</span>
+                                </div>
+                            `);
+                        });
+                    </script>
+                                <div class="flex items-center justify-between p-sm rounded-xl hover:bg-white/40 transition-colors">
+                                    <span class="font-body-md text-body-md w-12">Today</span>
+                                    <span class="material-symbols-outlined text-primary">cloud</span>
+                                    <span class="font-body-md text-body-md text-right">72 / 59</span>
+                                </div>
+                            
+                                <div class="flex items-center justify-between p-sm rounded-xl hover:bg-white/40 transition-colors">
+                                    <span class="font-body-md text-body-md w-12">Tue</span>
+                                    <span class="material-symbols-outlined text-primary">partly_cloudy_day</span>
+                                    <span class="font-body-md text-body-md text-right">74 / 60</span>
+                                </div>
+                            
+                                <div class="flex items-center justify-between p-sm rounded-xl hover:bg-white/40 transition-colors">
+                                    <span class="font-body-md text-body-md w-12">Wed</span>
+                                    <span class="material-symbols-outlined text-primary">sunny</span>
+                                    <span class="font-body-md text-body-md text-right">78 / 62</span>
+                                </div>
+                            
+                                <div class="flex items-center justify-between p-sm rounded-xl hover:bg-white/40 transition-colors">
+                                    <span class="font-body-md text-body-md w-12">Thu</span>
+                                    <span class="material-symbols-outlined text-primary">sunny</span>
+                                    <span class="font-body-md text-body-md text-right">80 / 65</span>
+                                </div>
+                            
+                                <div class="flex items-center justify-between p-sm rounded-xl hover:bg-white/40 transition-colors">
+                                    <span class="font-body-md text-body-md w-12">Fri</span>
+                                    <span class="material-symbols-outlined text-primary">rainy</span>
+                                    <span class="font-body-md text-body-md text-right">68 / 58</span>
+                                </div>
+                            
+                                <div class="flex items-center justify-between p-sm rounded-xl hover:bg-white/40 transition-colors">
+                                    <span class="font-body-md text-body-md w-12">Sat</span>
+                                    <span class="material-symbols-outlined text-primary">partly_cloudy_day</span>
+                                    <span class="font-body-md text-body-md text-right">70 / 59</span>
+                                </div>
+                            
+                                <div class="flex items-center justify-between p-sm rounded-xl hover:bg-white/40 transition-colors">
+                                    <span class="font-body-md text-body-md w-12">Sun</span>
+                                    <span class="material-symbols-outlined text-primary">cloud</span>
+                                    <span class="font-body-md text-body-md text-right">71 / 60</span>
+                                </div>
+                            
+</div>
+</div>
+</section>
+<!-- Detailed Metrics Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- UV Index -->
+<div class="glass-card rounded-3xl p-lg shadow-[0_8px_32px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-sm text-on-surface-variant mb-md">
+<span class="material-symbols-outlined text-primary">light_mode</span>
+<span class="font-label-md text-label-md uppercase">UV Index</span>
+</div>
+<p class="font-headline-md text-headline-md">4 Moderate</p>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full mt-lg">
+<div class="w-[40%] h-full bg-primary rounded-full"></div>
+</div>
+</div>
+<!-- Wind -->
+<div class="glass-card rounded-3xl p-lg shadow-[0_8px_32px_rgba(0,0,0,0.04)] relative">
+<div class="flex items-center gap-sm text-on-surface-variant mb-md">
+<span class="material-symbols-outlined text-primary">air</span>
+<span class="font-label-md text-label-md uppercase">Wind</span>
+</div>
+<div class="flex items-end gap-sm">
+<p class="font-display-lg text-[32px] font-bold">12</p>
+<div class="flex flex-col mb-xs">
+<span class="font-caption text-caption text-on-surface-variant">mph</span>
+<span class="font-caption text-caption text-primary">WNW</span>
+</div>
+</div>
+<div class="mt-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full border border-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary rotate-[135deg] text-sm">navigation</span>
+</div>
+<span class="font-caption text-caption">Gushing to 18 mph</span>
+</div>
+</div>
+<!-- Humidity -->
+<div class="glass-card rounded-3xl p-lg shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+<div class="flex items-center gap-sm text-on-surface-variant mb-md">
+<span class="material-symbols-outlined text-primary">humidity_percentage</span>
+<span class="font-label-md text-label-md uppercase">Humidity</span>
+</div>
+<p class="font-display-lg text-[32px] font-bold">64%</p>
+<p class="font-caption text-caption text-on-surface-variant mt-sm">The dew point is 56° right now.</p>
+</div>
+<!-- Visibility -->
+<div class="glass-card rounded-3xl p-lg shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+<div class="flex items-center gap-sm text-on-surface-variant mb-md">
+<span class="material-symbols-outlined text-primary">visibility</span>
+<span class="font-label-md text-label-md uppercase">Visibility</span>
+</div>
+<p class="font-display-lg text-[32px] font-bold">10 mi</p>
+<p class="font-caption text-caption text-on-surface-variant mt-sm">Clear sky conditions ahead.</p>
+</div>
+<!-- Sunset/Sunrise Large Card -->
+<div class="md:col-span-2 glass-card rounded-3xl p-lg shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden relative">
+<div class="flex items-center gap-sm text-on-surface-variant mb-xl">
+<span class="material-symbols-outlined text-primary">wb_twilight</span>
+<span class="font-label-md text-label-md uppercase">Sunset</span>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<p class="font-display-lg text-[40px] font-bold">7:42 PM</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Sunrise: 6:12 AM</p>
+</div>
+<div class="w-1/2 h-24 relative overflow-hidden">
+<svg class="w-full h-full" viewBox="0 0 200 80">
+<path class="text-primary/20" d="M 0 70 Q 100 -20 200 70" fill="none" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></path>
+<circle class="text-primary" cx="160" cy="35" fill="currentColor" r="5"></circle>
+</svg>
+</div>
+</div>
+</div>
+<!-- Precipitation Map Card -->
+<div class="md:col-span-2 glass-card rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden group">
+<div class="p-lg absolute top-0 left-0 z-10 w-full flex justify-between items-start pointer-events-none">
+<div class="flex items-center gap-sm bg-white/80 backdrop-blur-md px-md py-xs rounded-full border border-white">
+<span class="material-symbols-outlined text-primary text-sm">map</span>
+<span class="font-label-md text-label-md uppercase text-on-surface">Radar</span>
+</div>
+</div>
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A high-resolution satellite weather radar map of San Francisco and the Bay Area. The visualization features soft blue and green overlays indicating light cloud coverage and misty conditions. The map is presented in a bright, modern light-mode interface with a minimalist clean aesthetic, using a soft color palette to maintain clarity and professionalism." data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEkEA9FZs3yOH-X27YqWR33J2WIgOCTxmBxf7Are0nNY3UGOAeMvyK57FCpppT37zaGDtrxMFxMPotUxdRWXPwM9yz4dyI7BfLnsrixOpO3HoGRuBrN822SUl7FgmSHsspGoR_DqBh_pyvk-KY4EXSeLXR9yMBXm843JSaysO9zt2e0UgfEgLrl966X3C4TT8oPOsDHz3Q1E40qrM9Ml5zT0wtcButW5VYiAe3sa0AWUi5G1zD4k01CDA5gVGGWBaE95J_g2Yg5qY9">
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest/50 backdrop-blur-md w-full py-xl border-t border-white/20 mt-3xl">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-gutter w-full max-w-full mx-auto">
+<div class="flex flex-col gap-sm">
+<span class="font-headline-md text-headline-md font-bold text-primary">Weather</span>
+<p class="font-caption text-caption text-on-surface-variant max-w-md">© 2024 Weather. Data provided by OpenMeteo and Global Weather Registry.</p>
+</div>
+<div class="flex gap-lg">
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors hover:underline" href="#">Terms of Service</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors hover:underline" href="#">Privacy Policy</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors hover:underline" href="#">Data Sources</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors hover:underline" href="#">API Access</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and effects
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+
+
+</body></html>

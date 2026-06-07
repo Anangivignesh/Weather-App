@@ -1,0 +1,283 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Aether Weather | Interactive Map</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-fixed": "#e1e0ff",
+            "outline": "#9c8f79",
+            "surface-variant": "#2a3548",
+            "secondary": "#c0c1ff",
+            "inverse-primary": "#795900",
+            "tertiary-fixed": "#c9e6ff",
+            "surface": "#081425",
+            "inverse-on-surface": "#263143",
+            "surface-dim": "#081425",
+            "on-secondary-container": "#b0b2ff",
+            "on-error": "#690005",
+            "tertiary": "#cde8ff",
+            "tertiary-fixed-dim": "#89ceff",
+            "on-primary-fixed": "#261a00",
+            "on-tertiary": "#00344d",
+            "primary-fixed": "#ffdf9f",
+            "on-secondary-fixed-variant": "#2f2ebe",
+            "on-tertiary-fixed-variant": "#004c6e",
+            "surface-container-lowest": "#040e1f",
+            "on-surface": "#d8e3fb",
+            "surface-bright": "#2f3a4c",
+            "on-primary": "#402d00",
+            "surface-container-highest": "#2a3548",
+            "surface-container-high": "#1f2a3c",
+            "inverse-surface": "#d8e3fb",
+            "on-tertiary-fixed": "#001e2f",
+            "on-primary-container": "#6c4f00",
+            "surface-tint": "#f9bd22",
+            "surface-container-low": "#111c2d",
+            "tertiary-container": "#8ed0ff",
+            "error-container": "#93000a",
+            "primary-container": "#fbbf24",
+            "surface-container": "#152031",
+            "on-secondary": "#1000a9",
+            "primary-fixed-dim": "#f9bd22",
+            "on-primary-fixed-variant": "#5c4300",
+            "error": "#ffb4ab",
+            "on-surface-variant": "#d3c5ac",
+            "secondary-fixed-dim": "#c0c1ff",
+            "background": "#081425",
+            "secondary-container": "#3131c0",
+            "on-background": "#d8e3fb",
+            "primary": "#ffe1a7",
+            "on-error-container": "#ffdad6",
+            "on-tertiary-container": "#005981",
+            "on-secondary-fixed": "#07006c",
+            "outline-variant": "#4f4633"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "16px",
+            "card-padding": "20px",
+            "base": "8px",
+            "container-margin": "24px"
+          },
+          "fontFamily": {
+            "display-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "data-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-caps": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "display-lg": ["80px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+            "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "data-lg": ["48px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+            "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+            "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .glass-panel {
+      background: rgba(21, 32, 49, 0.15);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: inset 2px 2px 4px rgba(255, 255, 255, 0.05);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .radar-pulse {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #fbbf24;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center w-full px-container-margin py-4 sticky top-0 z-50 bg-surface/10 backdrop-blur-3xl border-b border-white/20">
+<div class="flex items-center gap-8">
+<h1 class="text-headline-lg font-headline-lg text-primary tracking-tight">Weather</h1>
+<nav class="hidden md:flex gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-all duration-300 px-3 py-1 rounded-lg" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Map</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-all duration-300 px-3 py-1 rounded-lg" href="#">Alerts</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-all duration-300 px-3 py-1 rounded-lg" href="#">Locations</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-white/10 transition-all duration-300">
+<span class="material-symbols-outlined text-primary">settings</span>
+</button>
+<button class="p-2 rounded-full hover:bg-white/10 transition-all duration-300">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Map Canvas -->
+<main class="relative flex-grow overflow-hidden">
+<!-- Map Background -->
+<div class="absolute inset-0 bg-surface">
+<img alt="Radar Map Base" class="w-full h-full object-cover grayscale brightness-50 opacity-80" data-alt="A highly detailed atmospheric radar weather map overlaying a dark, high-contrast satellite view of a coastal metropolitan area. Glowing neon green and vibrant orange precipitation patterns sweep across the terrain, rendered with a professional meteorology broadcast aesthetic. Soft teal highlights indicate cooler air masses while translucent white clouds drift above, creating a sense of scientific depth and immersive environmental data visualization." data-location="San Francisco Bay Area" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3zbJFdqyPL5-tY6nJGeWEdx9PJKK4iMI4q42ZEYnw3ASF8L8DWihabV-lPcz_W06RwuYkypgqOAtX9tt-TPa2m_2EJYRs2nUAFNQJWphgjfUV1iWjP9lwDkPRhg67_-7apx1w3zbHc2zxWBFvkwK4qZkRErpjxnht4E4tZHgfChW3JD6ervvpgqKczKP0zvE4nRzz1lFqFs0irlNs9FKLWX8Nj43PGGhZvWJX4QenxxpyzDfsxgjpVRK6_bcPtC-KtKn422UEtrVD">
+<!-- Radar Overlay Effect (Simplified simulation) -->
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-tertiary/5 mix-blend-screen radar-pulse"></div>
+</div>
+<!-- Left: SideNavBar (Shared Component Identity) -->
+
+<!-- UI Overlay Containers -->
+<div class="absolute inset-0 pointer-events-none p-container-margin flex flex-col justify-between">
+<!-- Top Row: Search & Layer Selector -->
+<div class="flex flex-col md:flex-row justify-between items-start gap-4 pointer-events-auto">
+<!-- Search Bar -->
+<div class="glass-panel rounded-full px-6 py-3 flex items-center gap-3 w-full max-w-md">
+<span class="material-symbols-outlined text-primary" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface placeholder-on-surface-variant w-full font-body-md" placeholder="Search location..." type="text">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="my_location">my_location</span>
+</div>
+<!-- Layer Selector -->
+<div class="glass-panel p-1 rounded-xl flex gap-1">
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-caps text-label-caps flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="rainy">rainy</span>
+            Precipitation
+          </button>
+<button class="text-on-surface-variant hover:bg-white/5 px-4 py-2 rounded-lg font-label-caps text-label-caps flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="air">air</span>
+            Wind
+          </button>
+<button class="text-on-surface-variant hover:bg-white/5 px-4 py-2 rounded-lg font-label-caps text-label-caps flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="thermostat">thermostat</span>
+            Temp
+          </button>
+<button class="text-on-surface-variant hover:bg-white/5 px-4 py-2 rounded-lg font-label-caps text-label-caps flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="cloud">cloud</span>
+            Clouds
+          </button>
+</div>
+</div>
+<!-- Bottom Center: Playback Controls -->
+<div class="flex flex-col gap-4 pointer-events-auto items-center">
+<!-- Legend (Floating Right on Desktop) -->
+<div class="glass-panel p-card-padding rounded-2xl flex flex-col gap-3 self-end mr-0 md:mr-4">
+<div class="text-label-caps font-label-caps text-primary border-b border-white/10 pb-2">Precipitation (mm/h)</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between gap-8">
+<span class="text-[10px] text-on-surface-variant uppercase font-bold">Light</span>
+<div class="h-2 w-32 rounded-full bg-gradient-to-r from-blue-400 via-green-400 to-yellow-400"></div>
+<span class="text-[10px] text-on-surface-variant uppercase font-bold">Severe</span>
+</div>
+</div>
+</div>
+<!-- Playback Bar -->
+<div class="glass-panel w-full max-w-4xl rounded-2xl p-4 flex items-center gap-6">
+<button class="bg-primary text-on-primary w-12 h-12 rounded-full flex items-center justify-center scale-95 active:opacity-80 transition-transform shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div class="flex-grow flex flex-col gap-2">
+<div class="flex justify-between text-label-caps font-label-caps text-on-surface-variant">
+<span class="">08:00 AM</span>
+<span class="text-primary">10:42 AM (Now)</span>
+<span class="">02:00 PM</span>
+</div>
+<div class="relative w-full h-2 bg-white/10 rounded-full overflow-hidden">
+<div class="absolute left-0 top-0 h-full bg-primary/30 w-1/2"></div>
+<input class="absolute inset-0 w-full opacity-0 cursor-pointer z-10" max="100" min="0" type="range" value="50">
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-glow"></div>
+</div>
+</div>
+<div class="flex flex-col items-end min-w-[80px]">
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary">1x</div>
+<div class="text-label-caps font-label-caps text-on-surface-variant">Speed</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Map Controls (Zoom/Compass) -->
+<div class="absolute right-container-margin top-1/2 -translate-y-1/2 flex flex-col gap-2 pointer-events-auto">
+<div class="glass-panel flex flex-col rounded-xl overflow-hidden">
+<button class="p-3 hover:bg-white/10 text-on-surface transition-colors border-b border-white/10">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<button class="p-3 hover:bg-white/10 text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+</div>
+<button class="glass-panel p-3 rounded-xl text-on-surface hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+</button>
+<button class="glass-panel p-3 rounded-xl text-primary hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined" data-icon="layers">layers</span>
+</button>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="w-full py-4 px-container-margin flex flex-col md:flex-row justify-between items-center text-center mt-auto bg-surface-dim/30 backdrop-blur-xl border-t border-white/10 z-50">
+<div class="font-body-md text-body-md text-on-surface-variant flex gap-4 mb-2 md:mb-0">
+<a class="hover:underline decoration-primary/50 opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="hover:underline decoration-primary/50 opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="hover:underline decoration-primary/50 opacity-80 hover:opacity-100 transition-opacity" href="#">Data Sources</a>
+</div>
+<div class="font-body-md text-body-md text-on-surface-variant">© 2024 Weather. Data provided by NOAA &amp; OpenWeather. Last updated: 2 mins ago.</div>
+</footer>
+<script>
+    // Micro-interaction for the playback slider and buttons
+    const playBtn = document.querySelector('button .material-symbols-outlined[data-icon="play_arrow"]');
+    let isPlaying = false;
+
+    playBtn?.parentElement.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      playBtn.textContent = isPlaying ? 'pause' : 'play_arrow';
+      playBtn.setAttribute('data-icon', isPlaying ? 'pause' : 'play_arrow');
+      
+      if(isPlaying) {
+        playBtn.parentElement.classList.add('animate-pulse');
+      } else {
+        playBtn.parentElement.classList.remove('animate-pulse');
+      }
+    });
+
+    // Layer selector interaction
+    const layerButtons = document.querySelectorAll('.glass-panel button');
+    layerButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        layerButtons.forEach(b => {
+          b.classList.remove('bg-primary-container', 'text-on-primary-container');
+          b.classList.add('text-on-surface-variant');
+        });
+        btn.classList.add('bg-primary-container', 'text-on-primary-container');
+        btn.classList.remove('text-on-surface-variant');
+      });
+    });
+  </script>
+
+
+
+
+</body></html>

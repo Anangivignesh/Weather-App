@@ -1,0 +1,350 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Severe Alerts | Aether Weather</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-top: 1px solid rgba(255, 255, 255, 1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .alert-pulse {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "on-primary-container": "#fefcff",
+                        "surface-tint": "#005ac2",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary-fixed": "#23005c",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#6ffbbe",
+                        "inverse-surface": "#213145",
+                        "surface": "#f8f9ff",
+                        "primary-fixed": "#d8e2ff",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary": "#0058be",
+                        "secondary-fixed": "#e9ddff",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#adc6ff",
+                        "on-primary-fixed-variant": "#004395",
+                        "primary-fixed-dim": "#adc6ff",
+                        "tertiary": "#006947",
+                        "surface-container-high": "#dce9ff",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed": "#001a42",
+                        "outline": "#727785",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-container": "#8455ef",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#f5fff6",
+                        "on-background": "#0b1c30",
+                        "secondary": "#6b38d4",
+                        "on-surface-variant": "#424754",
+                        "outline-variant": "#c2c6d6",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-secondary-container": "#fffbff",
+                        "on-surface": "#0b1c30",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#00855b",
+                        "primary-container": "#2170e4",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-bright": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "gutter": "24px",
+                        "2xl": "48px",
+                        "sm": "8px",
+                        "3xl": "64px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "caption": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "caption": ["12px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopNavBar -->
+<header class="w-full sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+<div class="flex justify-between items-center px-margin-desktop py-md w-full max-w-full mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary">Weather</div>
+<nav class="hidden md:flex items-center gap-gutter">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Map</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Alerts</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Locations</a>
+</nav>
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-white/50 border border-outline-variant rounded-full text-body-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all w-64" placeholder="Search alerts..." type="text">
+</div>
+<button class="p-2 hover:bg-primary/5 rounded-lg transition-all active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="w-full px-margin-desktop py-xl space-y-3xl max-w-[1600px] mx-auto">
+<!-- Flash Flood Warning Hero (Critical) -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
+<div class="lg:col-span-8 glass-card rounded-2xl p-lg relative overflow-hidden border-error/20 bg-error-container/10">
+<div class="absolute top-0 left-0 w-2 h-full bg-error"></div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-xl gap-md">
+<div class="flex items-center gap-md">
+<div class="bg-error text-on-error p-3 rounded-xl alert-pulse">
+<span class="material-symbols-outlined" data-icon="flood">flood</span>
+</div>
+<div>
+<span class="text-label-md font-label-md text-error bg-error/10 px-sm py-xs rounded-full uppercase tracking-wider">Urgent: Take Action</span>
+<h1 class="font-headline-lg text-headline-lg text-on-background mt-1">Flash Flood Warning</h1>
+</div>
+</div>
+<div class="glass-card px-xl py-md rounded-2xl border-error/30 text-center min-w-[180px]">
+<p class="text-caption font-caption text-on-surface-variant mb-1">Expires In</p>
+<p class="text-headline-md font-headline-md text-error" id="countdown">02:42:39</p>
+</div>
+</div>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-3xl mb-xl">
+                    Severe flash flooding is occurring or imminent. Torrential rainfall of 3-5 inches has been observed. Seek higher ground immediately and avoid driving through flooded areas.
+                </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="bg-white/80 p-md rounded-xl border border-outline-variant/30">
+<p class="text-caption font-caption text-outline mb-1">Impact Level</p>
+<p class="font-bold text-error">Life Threatening</p>
+</div>
+<div class="bg-white/80 p-md rounded-xl border border-outline-variant/30">
+<p class="text-caption font-caption text-outline mb-1">Peak Rainfall</p>
+<p class="font-bold text-on-surface">1.2"/hour</p>
+</div>
+<div class="bg-white/80 p-md rounded-xl border border-outline-variant/30">
+<p class="text-caption font-caption text-outline mb-1">Source</p>
+<p class="font-bold text-on-surface">Doppler Radar</p>
+</div>
+</div>
+</div>
+<!-- Real-time Status Card -->
+<div class="lg:col-span-4 glass-card rounded-2xl p-lg flex flex-col justify-center text-center">
+<div class="mb-md">
+<div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-md">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="waves">waves</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-background">River Level</h3>
+<p class="text-on-surface-variant">Central Creek Basin</p>
+</div>
+<div class="text-display-lg font-display-lg text-primary my-md">
+                    14.2<span class="text-headline-md">ft</span>
+</div>
+<p class="text-label-md font-label-md text-error bg-error/10 px-md py-xs rounded-full inline-block mx-auto">+3.1ft above flood stage</p>
+</div>
+</section>
+<!-- Secondary Alerts & Map Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Advisory Cards Stack -->
+<div class="lg:col-span-4 space-y-gutter">
+<div class="glass-card rounded-2xl p-lg border-l-4 border-l-secondary-container">
+<div class="flex justify-between items-start mb-sm">
+<h4 class="font-headline-md text-headline-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="air">air</span>
+                            High Wind Advisory
+                        </h4>
+<span class="text-caption font-caption text-secondary font-bold">ACTIVE</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mb-md">Sustained winds of 40mph with gusts up to 60mph expected through 8 PM tonight.</p>
+<div class="flex items-center gap-md">
+<div class="bg-secondary/10 px-md py-sm rounded-lg flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="speed">speed</span>
+<span class="text-secondary font-bold">58 MPH</span>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-lg border-l-4 border-l-tertiary">
+<div class="flex justify-between items-start mb-sm">
+<h4 class="font-headline-md text-headline-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary" data-icon="ac_unit">ac_unit</span>
+                            Winter Mix Update
+                        </h4>
+<span class="text-caption font-caption text-tertiary font-bold">FORECAST</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mb-md">Accumulation of 1-2 inches of sleet/snow expected in higher elevations tomorrow morning.</p>
+</div>
+</div>
+<!-- Evacuation Map -->
+<div class="lg:col-span-8 glass-card rounded-2xl overflow-hidden relative min-h-[400px]">
+<div class="absolute inset-0 z-0">
+<img alt="A professional high-resolution satellite map of a coastal city area showing highlighted red and orange zones for flood risk. The map has a clean modern light-mode interface with blue primary accents for safe routes. Subtle translucent overlays indicate moving storm fronts. The aesthetic is clinical, highly informative, and optimistic." class="w-full h-full object-cover opacity-80" data-location="San Francisco Bay Area" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoCn9wKvyZNTuaIobr25RiIWn6-dz8N3SAZpgGXRsAud2kW4ECjRRWiTMmIodSUHETfH0UX_yQ-uXkfguFpFI7WEIvR7frtkRbt4e9x22I5d8G743ZpmUXcBgIuHKDk0T44wtrGClQzSbz05QuzjJRY2o_cN9ZAdFSZ0edvOojhB01unUwMYeY-vauuyEWDZrDVdfLdcj6fqZStip8EQmeCuAobpFrw33W5gg025Nx8x22DqcIP8xeKp1l7cmNvhx4Xy6yolZvKQoP">
+<div class="absolute inset-0 bg-gradient-to-t from-white/40 to-transparent"></div>
+</div>
+<div class="absolute top-md left-md z-10 space-y-sm">
+<div class="glass-card px-md py-sm rounded-xl inline-flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="text-label-md font-label-md">Hazard Zone</span>
+</div>
+<div class="glass-card px-md py-sm rounded-xl inline-flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-label-md font-label-md">Evacuation Route</span>
+</div>
+</div>
+<div class="absolute bottom-md right-md left-md z-10 glass-card p-md rounded-2xl flex flex-col md:flex-row justify-between items-center gap-md">
+<div>
+<h5 class="font-bold text-on-background">Route 101 North Open</h5>
+<p class="text-caption text-on-surface-variant">Recommended route for Zone A residents</p>
+</div>
+<button class="bg-primary text-on-primary px-xl py-sm rounded-full font-bold active:scale-95 transition-all shadow-lg shadow-primary/20">
+                        Get Navigation
+                    </button>
+</div>
+</div>
+</section>
+<!-- Safety Checklist Bento -->
+<section class="space-y-lg">
+<h2 class="font-headline-lg text-headline-lg text-on-background">Flood Safety Checklist</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<div class="glass-card p-lg rounded-2xl group hover:border-primary/40 transition-all cursor-pointer">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-md group-hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="inventory">inventory</span>
+</div>
+<h4 class="font-bold text-on-background mb-sm">Emergency Kit</h4>
+<ul class="text-caption text-on-surface-variant space-y-xs">
+<li class="">• 3 days of water</li>
+<li class="">• Non-perishable food</li>
+<li class="">• Flashlight &amp; batteries</li>
+</ul>
+</div>
+<div class="glass-card p-lg rounded-2xl group hover:border-primary/40 transition-all cursor-pointer">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-md group-hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="power_off">power_off</span>
+</div>
+<h4 class="font-bold text-on-background mb-sm">Utility Safety</h4>
+<p class="text-caption text-on-surface-variant leading-relaxed">Turn off main switches and valves if instructed. Do not touch electrical equipment while wet.</p>
+</div>
+<div class="glass-card p-lg rounded-2xl group hover:border-primary/40 transition-all cursor-pointer">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-md group-hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="directions_car">directions_car</span>
+</div>
+<h4 class="font-bold text-on-background mb-sm">Turn Around</h4>
+<p class="text-caption text-on-surface-variant leading-relaxed">Don't Drown. Just 6 inches of moving water can knock you down, and 1 foot can sweep a vehicle.</p>
+</div>
+<div class="glass-card p-lg rounded-2xl group hover:border-primary/40 transition-all cursor-pointer">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-md group-hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="support_agent">support_agent</span>
+</div>
+<h4 class="font-bold text-on-background mb-sm">Contacts</h4>
+<p class="text-caption text-on-surface-variant leading-relaxed">Keep a list of emergency numbers. Text, don't talk, to keep lines open for responders.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl bg-surface-container-lowest/50 backdrop-blur-md border-t border-white/20">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-gutter w-full">
+<div class="flex flex-col gap-xs">
+<div class="font-headline-md text-headline-md font-bold text-primary">Weather</div>
+<p class="font-caption text-caption text-on-surface-variant">© 2024 Weather. Data provided by OpenMeteo and Global Weather Registry.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-caption text-caption hover:underline" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-caption text-caption hover:underline" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-caption text-caption hover:underline" href="#">Data Sources</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-caption text-caption hover:underline" href="#">API Access</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple countdown logic for the Flash Flood alert
+        function updateCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            if (!countdownElement) return;
+
+            let [hours, minutes, seconds] = countdownElement.innerText.split(':').map(Number);
+            
+            if (seconds > 0) {
+                seconds--;
+            } else {
+                if (minutes > 0) {
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    if (hours > 0) {
+                        hours--;
+                        minutes = 59;
+                        seconds = 59;
+                    }
+                }
+            }
+            
+            countdownElement.innerText = 
+                String(hours).padStart(2, '0') + ':' + 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+
+        // Micro-interaction for checklist
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousedown', () => card.style.transform = 'scale(0.98)');
+            card.addEventListener('mouseup', () => card.style.transform = 'scale(1)');
+            card.addEventListener('mouseleave', () => card.style.transform = 'scale(1)');
+        });
+    </script>
+
+
+</body></html>
