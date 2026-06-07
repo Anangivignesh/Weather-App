@@ -32,13 +32,232 @@ function AlertCountdown({ initialSeconds }) {
 }
 
 export default function AlertsView() {
-  const { detailedAlerts, activeLocation } = useWeather();
-  const [checklist, setChecklist] = useState([
-    { text: "Ensure backup batteries are fully charged", checked: true },
-    { text: "Fill all water storage containers", checked: true },
-    { text: "Identify interior safe-room in home", checked: true },
-    { text: "Secure patio furniture and bins", checked: false }
-  ]);
+  const { detailedAlerts, activeLocation, weatherData, setActiveTab } = useWeather();
+  const [checklist, setChecklist] = useState([]);
+  const [broadcasted, setBroadcasted] = useState(false);
+
+  // Generate dynamic alerts based on weatherData when not in live mode
+  const getDynamicAlerts = () => {
+    if (!weatherData) return [];
+
+    const cityName = weatherData.name || activeLocation?.name || "your area";
+    const condition = (weatherData.current?.condition || "").toLowerCase();
+    const temp = weatherData.current?.temp || 0;
+    const isCelsius = useWeather().isCelsius;
+    const windSpeed = weatherData.current?.wind_speed || 0;
+    const uvIndex = weatherData.current?.uv_index || 0;
+
+    const alerts = [];
+
+    // 1. Extreme Cold / Snow Conditions (e.g., Paris)
+    if (condition.includes("snow") || condition.includes("freeze") || (isCelsius ? temp <= 5 : temp <= 41)) {
+      alerts.push({
+        id: "dyn_alert_001",
+        sender_name: `National Weather Service (${cityName})`,
+        event: "Winter Weather Warning",
+        severity: "SEVERE WARNING",
+        end: Math.floor(Date.now() / 1000) + 12000,
+        description: `Significant snowfall and freezing temperatures of ${temp}°${isCelsius ? "C" : "F"} are expected. Road conditions will deteriorate rapidly. Travel is discouraged unless in an emergency.`,
+        affected_areas: [cityName, `${cityName} Metro Area`, "Surrounding Elevations"]
+      });
+      alerts.push({
+        id: "dyn_alert_002",
+        sender_name: `National Weather Service (${cityName})`,
+        event: "Freeze Advisory",
+        severity: "ADVISORY",
+        end: Math.floor(Date.now() / 1000) + 24000,
+        description: `Sub-freezing temperatures will threaten outdoor plants, crops, and unprotected plumbing. Take steps now to protect sensitive vegetation.`,
+        affected_areas: [cityName]
+      });
+      alerts.push({
+        id: "dyn_alert_003",
+        sender_name: "Weather Operations Center",
+        event: "Snowfall Accumulation Update",
+        severity: "INFORMATION",
+        end: Math.floor(Date.now() / 1000) + 36000,
+        description: `Elevations above 1,000 feet will see 2 to 4 inches of additional accumulation. Lower elevations will experience a freezing rain mix.`
+      });
+    }
+    // 2. Stormy / Heavy Winds / Thunderstorms (e.g., Portland)
+    else if (condition.includes("storm") || condition.includes("thunderstorm") || windSpeed >= 20) {
+      alerts.push({
+        id: "dyn_alert_001",
+        sender_name: `National Weather Service (${cityName})`,
+        event: "Flash Flood Warning",
+        severity: "SEVERE WARNING",
+        end: Math.floor(Date.now() / 1000) + 7940,
+        description: `Excessive runoff from heavy rainfall (${weatherData.current?.description || "storms"}) will cause flooding of small creeks, urban areas, highways, and low-lying spots. Turn around, don't drown!`,
+        affected_areas: [cityName, `${cityName} Lowlands`, "Drainage Basins"]
+      });
+      alerts.push({
+        id: "dyn_alert_002",
+        sender_name: `National Weather Service (${cityName})`,
+        event: "High Wind Advisory",
+        severity: "ADVISORY",
+        end: Math.floor(Date.now() / 1000) + 14400,
+        description: `Strong winds of ${windSpeed} mph/kph expected. Secure loose outdoor objects and exercise caution when driving high-profile vehicles.`,
+        affected_areas: [cityName]
+      });
+      alerts.push({
+        id: "dyn_alert_003",
+        sender_name: "Weather Operations Center",
+        event: "Radar Storm Track Update",
+        severity: "INFORMATION",
+        end: Math.floor(Date.now() / 1000) + 28800,
+        description: `Line of strong thunderstorms moving East-Northeast. Frequent cloud-to-ground lightning and brief torrential downpours reported.`
+      });
+    }
+    // 3. Heavy Rain / Showers (e.g., New York, London)
+    else if (condition.includes("rain") || condition.includes("drizzle") || condition.includes("shower")) {
+      alerts.push({
+        id: "dyn_alert_001",
+        sender_name: `National Weather Service (${cityName})`,
+        event: "Urban Flood Advisory",
+        severity: "ADVISORY",
+        end: Math.floor(Date.now() / 1000) + 10800,
+        description: `Ponding of water on roadways and minor flooding in low-lying areas is expected due to continuous ${weatherData.current?.description || "moderate rain"}. Drive with extreme care.`,
+        affected_areas: [cityName, `${cityName} Metro`]
+      });
+      alerts.push({
+        id: "dyn_alert_002",
+        sender_name: "Weather Operations Center",
+        event: "Rainfall Rate Statement",
+        severity: "INFORMATION",
+        end: Math.floor(Date.now() / 1000) + 18000,
+        description: `Steady rainfall rates will persist through the afternoon. Cumulative totals may reach 1.5 inches by midnight.`
+      });
+    }
+    // 4. Hot / High UV Index (e.g., Tokyo, Sunny places)
+    else if (uvIndex >= 6 || (isCelsius ? temp >= 25 : temp >= 77)) {
+      alerts.push({
+        id: "dyn_alert_001",
+        sender_name: `Health & Weather Board (${cityName})`,
+        event: "High UV Exposure Statement",
+        severity: "ADVISORY",
+        end: Math.floor(Date.now() / 1000) + 12000,
+        description: `Very high UV Index of ${uvIndex} detected. Generous sunscreen application (SPF 30+), hats, and sunglasses are highly recommended between 11 AM and 4 PM.`,
+        affected_areas: [cityName]
+      });
+      alerts.push({
+        id: "dyn_alert_002",
+        sender_name: "Environmental Protection Agency",
+        event: "Air Quality Forecast",
+        severity: "INFORMATION",
+        end: Math.floor(Date.now() / 1000) + 28800,
+        description: `Ozone levels are expected to be in the moderate range. Sensitive groups should consider reducing prolonged outdoor heavy exertion.`
+      });
+    }
+    // 5. Default/Mild (e.g., San Francisco - Cloudy, Clear but pleasant)
+    else {
+      alerts.push({
+        id: "dyn_alert_001",
+        sender_name: `Weather Operations Center (${cityName})`,
+        event: "Dense Fog Statement",
+        severity: "ADVISORY",
+        end: Math.floor(Date.now() / 1000) + 8000,
+        description: `Visibility reduced to less than 1/4 mile in local fog banks. Slow down, use low beam headlights, and keep a safe following distance.`,
+        affected_areas: [cityName, "Coastal Highway", "Surrounding Valleys"]
+      });
+      alerts.push({
+        id: "dyn_alert_002",
+        sender_name: `Weather Center (${cityName})`,
+        event: "Climatic Outlook Note",
+        severity: "INFORMATION",
+        end: Math.floor(Date.now() / 1000) + 16000,
+        description: `Pleasant weather conditions with light winds and moderate humidity of ${weatherData?.current?.humidity || 50}% expected to persist for the next 48 hours.`
+      });
+    }
+
+    return alerts;
+  };
+
+  // Generate dynamic checklist template based on weatherData
+  const getChecklistTemplate = () => {
+    if (!weatherData) return [];
+    const condition = (weatherData.current?.condition || "").toLowerCase();
+    const temp = weatherData.current?.temp || 0;
+    const isCelsius = useWeather().isCelsius;
+    const windSpeed = weatherData.current?.wind_speed || 0;
+    const uvIndex = weatherData.current?.uv_index || 0;
+
+    if (condition.includes("snow") || condition.includes("freeze") || (isCelsius ? temp <= 5 : temp <= 41)) {
+      return [
+        { text: "Drip water faucets to prevent pipe freezing", checked: false },
+        { text: "Check heating systems and fuel supplies", checked: true },
+        { text: "Wrap outdoor exposed pipes and hose bibbs", checked: false },
+        { text: "Ensure vehicle winter emergency kit is stocked", checked: false }
+      ];
+    } else if (condition.includes("storm") || condition.includes("thunderstorm") || windSpeed >= 20) {
+      return [
+        { text: "Ensure backup batteries are fully charged", checked: true },
+        { text: "Secure patio furniture, trash bins, and outdoor items", checked: false },
+        { text: "Clear leaves and debris from storm drains", checked: false },
+        { text: "Ensure sump pump and backup power are operational", checked: true }
+      ];
+    } else if (condition.includes("rain") || condition.includes("drizzle") || condition.includes("shower")) {
+      return [
+        { text: "Check vehicle windshield wipers", checked: true },
+        { text: "Clear gutters of any blockages", checked: false },
+        { text: "Keep umbrellas and wet-weather gear by the door", checked: true },
+        { text: "Avoid walking or driving through standing water", checked: false }
+      ];
+    } else if (uvIndex >= 6 || (isCelsius ? temp >= 25 : temp >= 77)) {
+      return [
+        { text: "Limit direct sunlight exposure during peak hours", checked: false },
+        { text: "Drink plenty of water and maintain hydration", checked: true },
+        { text: "Apply SPF 30+ sunscreen before going outdoors", checked: false },
+        { text: "Ensure pets have adequate shade and fresh water", checked: true }
+      ];
+    } else {
+      return [
+        { text: "Review home emergency evacuation routes", checked: true },
+        { text: "Check expiry dates in your first aid kit", checked: false },
+        { text: "Inspect smoke and carbon monoxide detectors", checked: true },
+        { text: "Ensure vehicle tire pressures are at correct levels", checked: false }
+      ];
+    }
+  };
+
+  // Generate dynamic evacuation routes
+  const getEvacuationRoutes = () => {
+    if (!weatherData) return [];
+    const condition = (weatherData.current?.condition || "").toLowerCase();
+    const temp = weatherData.current?.temp || 0;
+    const isCelsius = useWeather().isCelsius;
+    const windSpeed = weatherData.current?.wind_speed || 0;
+    const uvIndex = weatherData.current?.uv_index || 0;
+
+    if (condition.includes("snow") || condition.includes("freeze") || (isCelsius ? temp <= 5 : temp <= 41)) {
+      return [
+        { icon: "ac_unit", title: "Warming Center (Downtown Civic Center)", status: "OPEN - LIGHT FOOTPRINT", statusColor: "text-green-400" },
+        { icon: "directions_car", title: "Highway 26 (Pass chains required)", status: "SLOW - HEAVY SLUSH", statusColor: "text-red-400" }
+      ];
+    } else if (condition.includes("storm") || condition.includes("thunderstorm") || windSpeed >= 20) {
+      return [
+        { icon: "directions_car", title: "I-5 Corridor (Southbound)", status: "FLOW: LIGHT TRAFFIC", statusColor: "text-green-400" },
+        { icon: "directions_car", title: "Highway 26 (Westbound)", status: "FLOW: HEAVY CONGESTION", statusColor: "text-red-400" }
+      ];
+    } else if (condition.includes("rain") || condition.includes("drizzle") || condition.includes("shower")) {
+      return [
+        { icon: "commute", title: "Light Rail transit lines", status: "NORMAL OPERATIONS", statusColor: "text-green-400" },
+        { icon: "directions_car", title: "Broadway Boulevard (Flooding reported)", status: "DETOUR IN PLACE", statusColor: "text-yellow-400" }
+      ];
+    } else if (uvIndex >= 6 || (isCelsius ? temp >= 25 : temp >= 77)) {
+      return [
+        { icon: "wb_sunny", title: "Cooling Center (City Central Library)", status: "OPEN - AC ACTIVE", statusColor: "text-green-400" },
+        { icon: "nature_people", title: "Public Parks & Shaded Zones", status: "MODERATE FOOTPRINT", statusColor: "text-yellow-400" }
+      ];
+    } else {
+      return [
+        { icon: "directions_bus", title: "Public Bus Routes", status: "ON SCHEDULE", statusColor: "text-green-400" },
+        { icon: "commute", title: "Local Expressways", status: "NORMAL TRAFFIC", statusColor: "text-green-400" }
+      ];
+    }
+  };
+
+  useEffect(() => {
+    setChecklist(getChecklistTemplate());
+  }, [weatherData?.name]);
 
   const toggleCheck = (idx) => {
     setChecklist(prev =>
@@ -46,43 +265,17 @@ export default function AlertsView() {
     );
   };
 
-  // If there are no severe alerts active for this location, we fall back to Portland's mock warnings
-  // so the user can see how beautiful the warnings are. We show a banner that they are demoing active alerts.
   const hasLocalAlerts = detailedAlerts.length > 0;
-  
-  // Portland alerts as demo fallback
-  const demoAlerts = [
-    {
-      id: "alert_001",
-      sender_name: "NWS Portland (Oregon)",
-      event: "Flash Flood Warning",
-      severity: "SEVERE WARNING",
-      end: Math.floor(Date.now() / 1000) + 7940, // ~02:12:20
-      description: "Excessive runoff from heavy rainfall will cause flooding of small creeks and streams, urban areas, highways, streets, and underpasses as well as other drainage areas and low-lying spots. Turn around, don't drown when encountering flooded roads.",
-      affected_areas: ["South Cascades", "Portland Metro", "Willamette Valley"]
-    },
-    {
-      id: "alert_002",
-      sender_name: "NWS Portland (Oregon)",
-      event: "High Wind Advisory",
-      severity: "ADVISORY",
-      end: Math.floor(Date.now() / 1000) + 14400,
-      description: "Northwest winds 25 to 35 mph with gusts up to 55 mph expected. Secure outdoor objects and furniture."
-    },
-    {
-      id: "alert_003",
-      sender_name: "NWS Weather Center",
-      event: "Winter Mix Update",
-      severity: "INFORMATION",
-      end: Math.floor(Date.now() / 1000) + 28800,
-      description: "Light freezing rain and sleet possible for elevations above 1500ft later this evening."
-    }
-  ];
-
-  const activeAlerts = hasLocalAlerts ? detailedAlerts : demoAlerts;
+  const activeAlerts = hasLocalAlerts ? detailedAlerts : getDynamicAlerts();
 
   const severeAlert = activeAlerts.find(a => a.severity === "SEVERE WARNING" || a.event.includes("Warning"));
   const otherAlerts = activeAlerts.filter(a => a.id !== severeAlert?.id);
+  const routes = getEvacuationRoutes();
+
+  const handleBroadcast = () => {
+    setBroadcasted(true);
+    setTimeout(() => setBroadcasted(false), 3500);
+  };
 
   // Expiration calculation helper
   const getSecondsUntil = (unixEndTime) => {
@@ -92,6 +285,14 @@ export default function AlertsView() {
 
   return (
     <div className="space-y-12">
+      {/* Broadcast Alert Toast Notification */}
+      {broadcasted && (
+        <div className="fixed bottom-6 right-6 z-50 bg-green-500 text-white font-bold px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in-up border border-green-400/20">
+          <span className="material-symbols-outlined">check_circle</span>
+          <span>Alert successfully broadcasted to local emergency channels.</span>
+        </div>
+      )}
+
       {/* Header Section */}
       <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-6">
         <div>
@@ -102,7 +303,7 @@ export default function AlertsView() {
         </div>
         {!hasLocalAlerts && (
           <div className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-bold">
-            Alert Demo Mode (Showing Portland, OR Alerts)
+            Demo Mode (Simulating alerts for {weatherData?.name || activeLocation?.name})
           </div>
         )}
       </section>
@@ -175,10 +376,16 @@ export default function AlertsView() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 z-10 border-t border-white/5 pt-4">
-                <button className="flex-1 py-3.5 rounded-xl bg-error text-on-error font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity text-sm">
+                <button 
+                  onClick={handleBroadcast}
+                  className="flex-1 py-3.5 rounded-xl bg-error text-on-error font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity text-sm"
+                >
                   <span className="material-symbols-outlined text-lg">share</span> Broadcast Alert
                 </button>
-                <button className="flex-1 py-3.5 rounded-xl border border-error/30 text-error font-bold flex items-center justify-center gap-2 hover:bg-error/10 transition-all text-sm">
+                <button 
+                  onClick={() => setActiveTab("map")}
+                  className="flex-1 py-3.5 rounded-xl border border-error/30 text-error font-bold flex items-center justify-center gap-2 hover:bg-error/10 transition-all text-sm"
+                >
                   <span className="material-symbols-outlined text-lg">map</span> View Local Shelters
                 </button>
               </div>
@@ -262,24 +469,26 @@ export default function AlertsView() {
             <div>
               <h2 className="font-headline-lg text-headline-lg text-2xl font-bold mb-4">Evacuation Routes</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="material-symbols-outlined text-primary">directions_car</span>
-                    <span className="font-bold text-on-surface text-sm">I-5 Corridor (Southbound)</span>
+                {routes.map((route, idx) => (
+                  <div 
+                    key={idx} 
+                    onClick={() => setActiveTab("map")}
+                    className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="material-symbols-outlined text-primary">{route.icon}</span>
+                      <span className="font-bold text-on-surface text-sm">{route.title}</span>
+                    </div>
+                    <p className={`text-[10px] font-bold ${route.statusColor} uppercase tracking-wider`}>{route.status}</p>
                   </div>
-                  <p className="text-[10px] font-bold text-green-400 uppercase tracking-wider">FLOW: LIGHT TRAFFIC</p>
-                </div>
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="material-symbols-outlined text-primary">directions_car</span>
-                    <span className="font-bold text-on-surface text-sm">Highway 26 (Westbound)</span>
-                  </div>
-                  <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider">FLOW: HEAVY CONGESTION</p>
-                </div>
+                ))}
               </div>
             </div>
             
-            <button className="mt-6 inline-flex items-center gap-2 text-primary font-bold group text-sm self-start">
+            <button 
+              onClick={() => setActiveTab("map")}
+              className="mt-6 inline-flex items-center gap-2 text-primary font-bold group text-sm self-start"
+            >
               Open Evacuation Map 
               <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform text-md">arrow_forward</span>
             </button>
