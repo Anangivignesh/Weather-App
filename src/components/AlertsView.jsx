@@ -32,7 +32,7 @@ function AlertCountdown({ initialSeconds }) {
 }
 
 export default function AlertsView() {
-  const { detailedAlerts, activeLocation, weatherData, setActiveTab } = useWeather();
+  const { detailedAlerts, activeLocation, weatherData, setActiveTab, isCelsius } = useWeather();
   const [checklist, setChecklist] = useState([]);
   const [broadcasted, setBroadcasted] = useState(false);
 
@@ -43,7 +43,6 @@ export default function AlertsView() {
     const cityName = weatherData.name || activeLocation?.name || "your area";
     const condition = (weatherData.current?.condition || "").toLowerCase();
     const temp = weatherData.current?.temp || 0;
-    const isCelsius = useWeather().isCelsius;
     const windSpeed = weatherData.current?.wind_speed || 0;
     const uvIndex = weatherData.current?.uv_index || 0;
 
@@ -176,7 +175,6 @@ export default function AlertsView() {
     if (!weatherData) return [];
     const condition = (weatherData.current?.condition || "").toLowerCase();
     const temp = weatherData.current?.temp || 0;
-    const isCelsius = useWeather().isCelsius;
     const windSpeed = weatherData.current?.wind_speed || 0;
     const uvIndex = weatherData.current?.uv_index || 0;
 
@@ -223,7 +221,6 @@ export default function AlertsView() {
     if (!weatherData) return [];
     const condition = (weatherData.current?.condition || "").toLowerCase();
     const temp = weatherData.current?.temp || 0;
-    const isCelsius = useWeather().isCelsius;
     const windSpeed = weatherData.current?.wind_speed || 0;
     const uvIndex = weatherData.current?.uv_index || 0;
 
