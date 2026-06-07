@@ -312,13 +312,13 @@ export default function DashboardView() {
             <div className="flex-grow flex flex-col justify-center gap-2">
               <div className="flex justify-between items-center">
                 <span className="text-xs text-on-surface-variant font-semibold flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm text-yellow-500">sunrise</span> Sunrise
+                  <span className="material-symbols-outlined text-sm text-yellow-500">sunny</span> Sunrise
                 </span>
                 <span className="font-headline-lg text-on-surface font-bold text-sm">{current.sunrise}</span>
               </div>
               <div className="flex justify-between items-center border-t border-white/10 pt-2 mt-1">
                 <span className="text-xs text-on-surface-variant font-semibold flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm text-orange-500">sunset</span> Sunset
+                  <span className="material-symbols-outlined text-sm text-orange-500">wb_twilight</span> Sunset
                 </span>
                 <span className="font-headline-lg text-on-surface font-bold text-sm">{current.sunset}</span>
               </div>
