@@ -1,4 +1,4 @@
-# Aether Weather Dashboard
+# Weather Dashboard
 
 A modern, high-performance, and visually stunning Weather Dashboard application built with **React**, **Vite**, **Tailwind CSS**, and **Leaflet**. Designed with rich aesthetics, glassmorphism, responsive bento grids, and micro-animations, this app offers a premium user experience that adapts dynamically to global locations.
 
@@ -7,7 +7,7 @@ A modern, high-performance, and visually stunning Weather Dashboard application 
 ## 🌟 Unique Selling Points (USPs) & Core Features
 
 ### 1. Dynamic Timezone-Corrected Theme Sync
-Unlike standard weather apps that shift theme based on the user's browser clock, **Aether Weather** determines if it is day or night in the *target city* using the API's `timezone_offset`. Selecting **Tokyo** at 9:00 PM local time shifts the app into a dark theme, while selecting **Dallas** at 7:00 AM local time shifts the app to a light theme.
+Unlike standard weather apps that shift theme based on the user's browser clock, **Weather** determines if it is day or night in the *target city* using the API's `timezone_offset`. Selecting **Tokyo** at 9:00 PM local time shifts the app into a dark theme, while selecting **Dallas** at 7:00 AM local time shifts the app to a light theme.
 * **Light Theme (Day)**: Warm gradients and high-contrast styling.
 * **Dark Theme (Night)**: Sleek, high-tech glassmorphism with cool violet and indigo glows.
 

@@ -57,7 +57,7 @@ function WeatherAppContent() {
       <footer className="w-full py-8 px-container-margin flex flex-col md:flex-row justify-between items-center text-center mt-auto bg-surface-dim/30 backdrop-blur-xl border-t border-white/10 text-on-surface-variant z-10">
         <div className="mb-4 md:mb-0 text-left">
           <div className="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold text-base mb-1">
-            Aether Weather
+            Weather
           </div>
           <p className="font-body-md text-xs opacity-70">
             © 2026 Weather Dashboard. Live data powered by OpenWeather One Call API 4.0.
