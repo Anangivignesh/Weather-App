@@ -45,7 +45,10 @@ A dedicated Map tab renders an interactive map of the selected location, centere
 ### 4. 🗂️ Bento-Style Saved Locations
 A customizable settings page where users can manage saved locations in a sleek bento grid. Hovering over a card reveals a smooth action transition that hides the weather icon and reveals a delete option to prevent UI overlap.
 
-### 5. 🔒 API Safety & Settings
+### 5. 📱 Mobile-First Layout & Responsiveness
+Designed with adaptive flex grids, responsive padding, flexible typography, and auto-collapsing UI controls (such as responsive labels in the map playback scrubber). The entire application fits cleanly on screen widths down to 320px with zero horizontal scrollbars, text overlaps, or clipping.
+
+### 6. 🔒 API Safety & Settings
 Equipped with Unit toggles (°C / °F and wind speeds in km/h, mph, or m/s) and fully integrated with secure environment variables (`.env`) to keep API keys safe.
 
 ---

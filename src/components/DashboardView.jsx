@@ -67,42 +67,87 @@ export default function DashboardView() {
     return "https://lh3.googleusercontent.com/aida-public/AB6AXuBEkEA9FZs3yOH-X27YqWR33J2WIgOCTxmBxf7Are0nNY3UGOAeMvyK57FCpppT37zaGDtrxMFxMPotUxdRWXPwM9yz4dyI7BfLnsrixOpO3HoGRuBrN822SUl7FgmSHsspGoR_DqBh_pyvk-KY4EXSeLXR9yMBXm843JSaysO9zt2e0UgfEgLrl966X3C4TT8oPOsDHz3Q1E40qrM9Ml5zT0wtcButW5VYiAe3sa0AWUi5G1zD4k01CDA5gVGGWBaE95J_g2Yg5qY9";
   };
 
+  const getActivitiesAdvice = () => {
+    if (!current) return null;
+    const cond = (current.condition || "").toLowerCase();
+    const temp = current.temp || 0;
+    const wind = current.wind_speed || 0;
+    const uv = current.uv_index || 0;
+
+    const advice = {
+      workout: { status: "Good", color: "text-green-400 bg-green-400/10 border-green-500/20", text: "Nice temperature for running or outdoor cycling." },
+      gardening: { status: "Good", color: "text-green-400 bg-green-400/10 border-green-500/20", text: "Ideal conditions to trim and care for your plants." },
+      dining: { status: "Great", color: "text-green-400 bg-green-400/10 border-green-500/20", text: "Comfortable breezes, perfect for dining out." },
+      stargazing: { status: "Optimal", color: "text-green-400 bg-green-400/10 border-green-500/20", text: "Clear, cloudless skies expected tonight." }
+    };
+
+    if (cond.includes("storm") || cond.includes("thunderstorm") || wind >= 25) {
+      advice.workout = { status: "Poor", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Severe winds & lightning hazard. Avoid outdoor tracks." };
+      advice.gardening = { status: "Poor", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Secure pots and fragile plants from heavy storm." };
+      advice.dining = { status: "Bad", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Severe stormy weather. Better dine indoors." };
+      advice.stargazing = { status: "Bad", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Storm clouds and heavy rain will block visibility." };
+    } else if (cond.includes("rain") || cond.includes("drizzle") || cond.includes("shower")) {
+      advice.workout = { status: "Fair", color: "text-yellow-400 bg-yellow-400/10 border-yellow-500/20", text: "Rain active. Bring water-resistant gear if running." };
+      advice.gardening = { status: "Excellent", color: "text-green-400 bg-green-400/10 border-green-500/20", text: "Rain will water your garden naturally today." };
+      advice.dining = { status: "Bad", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Wet and damp conditions. Outdoor seating closed." };
+      advice.stargazing = { status: "Bad", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Overcast skies and rain will obstruct stargazing." };
+    } else if (cond.includes("snow") || cond.includes("freeze") || (isCelsius ? temp <= 5 : temp <= 41)) {
+      advice.workout = { status: "Poor", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Freezing temperatures. Prefer indoor workouts." };
+      advice.gardening = { status: "Caution", color: "text-yellow-400 bg-yellow-400/10 border-yellow-500/20", text: "Protect delicate crops from ground frost." };
+      advice.dining = { status: "Bad", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Freezing cold. Keep patio heaters on or stay inside." };
+      advice.stargazing = { status: "Fair", color: "text-yellow-400 bg-yellow-400/10 border-yellow-500/20", text: "Cold but clear air can yield great night visibility." };
+    } else if (uv >= 6 || (isCelsius ? temp >= 28 : temp >= 82)) {
+      advice.workout = { status: "Caution", color: "text-yellow-400 bg-yellow-400/10 border-yellow-500/20", text: "High heat and UV exposure. Stay hydrated." };
+      advice.gardening = { status: "Fair", color: "text-yellow-400 bg-yellow-400/10 border-yellow-500/20", text: "Water early in the morning to avoid evaporation." };
+      advice.dining = { status: "Great", color: "text-green-400 bg-green-400/10 border-green-500/20", text: "Warm evening. Shaded areas recommended." };
+      advice.stargazing = { status: "Excellent", color: "text-green-400 bg-green-400/10 border-green-500/20", text: "Clear and warm night. Perfect stargazing." };
+    } else if (cond.includes("cloud") || cond.includes("overcast")) {
+      advice.stargazing = { status: "Poor", color: "text-red-400 bg-red-400/10 border-red-500/20", text: "Heavy cloud cover will block celestial views." };
+      advice.workout = { status: "Good", color: "text-green-400 bg-green-400/10 border-green-500/20", text: "Overcast skies keep it cool. Perfect for running." };
+      advice.dining = { status: "Fair", color: "text-yellow-400 bg-yellow-400/10 border-yellow-500/20", text: "Slightly cloudy, but otherwise fine for outdoor dining." };
+    }
+
+    return advice;
+  };
+
+  const advice = getActivitiesAdvice();
+
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
       {/* Left Column: Hero & Hourly */}
       <div className="xl:col-span-8 flex flex-col gap-gutter">
         {/* Main Weather Hero */}
-        <section className="glass-card rounded-3xl p-10 relative overflow-hidden min-h-[380px] flex flex-col justify-center">
+        <section className="glass-card rounded-3xl p-6 md:p-10 relative overflow-hidden min-h-[320px] md:min-h-[380px] flex flex-col justify-center">
           
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center w-full">
-            <div className="space-y-4">
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center w-full min-w-0">
+            <div className="space-y-4 w-full md:w-auto min-w-0">
               {localTimeStr && (
-                <p className="font-label-caps text-label-caps text-primary text-sm font-bold tracking-wider uppercase mb-1">
+                <p className="font-label-caps text-label-caps text-primary text-xs sm:text-sm font-bold tracking-wider uppercase mb-1">
                   Local Time: {localTimeStr}
                 </p>
               )}
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary-fixed" style={{ fontVariationSettings: "'FILL' 1" }}>
+              <div className="flex items-center gap-2 max-w-full min-w-0">
+                <span className="material-symbols-outlined text-primary-fixed shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
                   location_on
                 </span>
-                <h2 className="font-headline-lg text-headline-lg text-on-surface text-3xl font-bold">
+                <h2 className="font-headline-lg text-headline-lg text-on-surface text-xl sm:text-2xl md:text-3xl font-bold truncate">
                   {name}{state ? `, ${state}` : ""}{country ? ` (${country})` : ""}
                 </h2>
               </div>
               
-              <div className="flex items-baseline gap-2">
-                <h3 className="font-display-lg text-[100px] md:text-[140px] leading-none text-primary font-bold">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <h3 className="font-display-lg text-6xl sm:text-8xl md:text-[140px] leading-none text-primary font-bold">
                   {current.temp}°
                 </h3>
                 <div className="flex flex-col">
-                  <p className="font-headline-lg text-headline-lg text-on-surface-variant text-xl">
+                  <p className="font-headline-lg text-headline-lg text-on-surface-variant text-lg sm:text-xl">
                     {current.condition}
                   </p>
                   <div className="flex gap-4 mt-1">
-                    <span className="font-body-md text-on-surface font-semibold">
+                    <span className="font-body-md text-on-surface font-semibold text-sm">
                       H: {current.temp_max}°
                     </span>
-                    <span className="font-body-md text-on-surface-variant">
+                    <span className="font-body-md text-on-surface-variant text-sm">
                       L: {current.temp_min}°
                     </span>
                   </div>
@@ -110,14 +155,14 @@ export default function DashboardView() {
               </div>
             </div>
             
-            <div className="mt-8 md:mt-0 flex flex-col items-center md:items-end gap-4 self-center md:self-auto">
+            <div className="mt-6 md:mt-0 flex flex-col items-start md:items-end gap-3 self-start md:self-auto w-full md:w-auto">
               <span 
-                className="material-symbols-outlined text-[100px] md:text-[120px] weather-icon-glow text-primary-container" 
+                className="material-symbols-outlined text-6xl sm:text-[100px] md:text-[120px] weather-icon-glow text-primary-container" 
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 {current.icon}
               </span>
-              <div className="px-6 py-2 rounded-full bg-primary-container/20 border border-primary/30 text-primary font-bold text-sm">
+              <div className="px-4 py-1.5 sm:px-6 sm:py-2 rounded-full bg-primary-container/20 border border-primary/30 text-primary font-bold text-xs sm:text-sm">
                 {current.description}
               </div>
             </div>
@@ -125,22 +170,23 @@ export default function DashboardView() {
         </section>
 
         {/* Hourly Forecast */}
-        <section className="glass-card rounded-3xl p-card-padding">
-          <div className="flex justify-between items-center mb-6">
+        <section className="glass-card rounded-3xl p-4 md:p-card-padding">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
             <h4 className="font-label-caps text-label-caps uppercase text-on-surface-variant flex items-center gap-2 text-xs font-bold tracking-wider">
               <span className="material-symbols-outlined text-sm">
                 schedule
               </span>
               Hourly Forecast
             </h4>
-            <div className="flex bg-surface-container-highest/30 p-1 rounded-lg">
+            <div className="flex bg-surface-container-highest/30 p-1 rounded-lg shrink-0">
               <button 
                 onClick={() => setHourlyTab("24h")}
                 className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
                   hourlyTab === "24h" ? "bg-primary/20 text-primary" : "text-on-surface-variant hover:text-on-surface"
                 }`}
               >
-                24 Hours
+                <span className="sm:hidden">24h</span>
+                <span className="hidden sm:inline">24 Hours</span>
               </button>
               <button 
                 onClick={() => setHourlyTab("precip")}
@@ -148,7 +194,8 @@ export default function DashboardView() {
                   hourlyTab === "precip" ? "bg-primary/20 text-primary" : "text-on-surface-variant hover:text-on-surface"
                 }`}
               >
-                Precipitation
+                <span className="sm:hidden">Precip</span>
+                <span className="hidden sm:inline">Precipitation</span>
               </button>
             </div>
           </div>
@@ -196,16 +243,16 @@ export default function DashboardView() {
         </section>
 
         {/* Bento Grid for Metrics */}
-        <section className="grid grid-cols-2 md:grid-cols-3 gap-gutter">
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-gutter">
           {/* UV Index */}
-          <div className="glass-card rounded-3xl p-card-padding flex flex-col justify-between min-h-[160px]">
+          <div className="glass-card rounded-3xl p-4 md:p-card-padding flex flex-col justify-between min-h-[160px]">
             <div className="flex items-center gap-2 text-on-surface-variant">
               <span className="material-symbols-outlined text-sm">sunny</span>
               <span className="font-label-caps text-label-caps uppercase text-xs">UV Index</span>
             </div>
             <div className="space-y-1">
-              <p className="font-data-lg text-data-lg text-on-surface text-4xl font-bold">{current.uv_index}</p>
-              <p className="font-body-md text-on-surface-variant text-sm">{current.uv_desc}</p>
+              <p className="font-data-lg text-data-lg text-on-surface text-3xl sm:text-4xl font-bold">{current.uv_index}</p>
+              <p className="font-body-md text-on-surface-variant text-xs sm:text-sm">{current.uv_desc}</p>
             </div>
             <div className="w-full bg-white/10 h-1 rounded-full mt-2 overflow-hidden">
               <div 
@@ -216,14 +263,14 @@ export default function DashboardView() {
           </div>
 
           {/* Air Quality */}
-          <div className="glass-card rounded-3xl p-card-padding flex flex-col justify-between min-h-[160px]">
+          <div className="glass-card rounded-3xl p-4 md:p-card-padding flex flex-col justify-between min-h-[160px]">
             <div className="flex items-center gap-2 text-on-surface-variant">
               <span className="material-symbols-outlined text-sm">air</span>
               <span className="font-label-caps text-label-caps uppercase text-xs">Air Quality</span>
             </div>
             <div className="space-y-1">
-              <p className="font-data-lg text-data-lg text-on-surface text-4xl font-bold">{current.air_quality}</p>
-              <p className="font-body-md text-on-surface-variant text-sm">{current.air_desc}</p>
+              <p className="font-data-lg text-data-lg text-on-surface text-3xl sm:text-4xl font-bold">{current.air_quality}</p>
+              <p className="font-body-md text-on-surface-variant text-xs sm:text-sm">{current.air_desc}</p>
             </div>
             <div className="w-full bg-white/10 h-1 rounded-full mt-2 overflow-hidden">
               <div 
@@ -234,7 +281,7 @@ export default function DashboardView() {
           </div>
 
           {/* Wind Speed */}
-          <div className="glass-card rounded-3xl p-card-padding flex flex-col justify-between min-h-[160px]">
+          <div className="glass-card rounded-3xl p-4 md:p-card-padding flex flex-col justify-between min-h-[160px]">
             <div className="flex items-center gap-2 text-on-surface-variant">
               <span className="material-symbols-outlined text-sm">airwave</span>
               <span className="font-label-caps text-label-caps uppercase text-xs">Wind</span>
@@ -262,17 +309,17 @@ export default function DashboardView() {
           </div>
 
           {/* Humidity */}
-          <div className="glass-card rounded-3xl p-card-padding flex flex-col justify-between min-h-[160px]">
+          <div className="glass-card rounded-3xl p-4 md:p-card-padding flex flex-col justify-between min-h-[160px]">
             <div className="flex items-center gap-2 text-on-surface-variant">
               <span className="material-symbols-outlined text-sm">humidity_low</span>
               <span className="font-label-caps text-label-caps uppercase text-xs">Humidity</span>
             </div>
             <div className="space-y-1">
-              <p className="font-data-lg text-data-lg text-on-surface text-4xl font-bold">
+              <p className="font-data-lg text-data-lg text-on-surface text-3xl sm:text-4xl font-bold">
                 {current.humidity}
-                <span className="text-xl font-normal ml-1">%</span>
+                <span className="text-lg sm:text-xl font-normal ml-0.5">%</span>
               </p>
-              <p className="font-body-md text-on-surface-variant text-sm">Dew point {current.dew_point}°</p>
+              <p className="font-body-md text-on-surface-variant text-xs sm:text-sm">Dew point {current.dew_point}°</p>
             </div>
             <div className="w-full bg-white/10 h-1 rounded-full mt-2 overflow-hidden">
               <div 
@@ -283,17 +330,17 @@ export default function DashboardView() {
           </div>
 
           {/* Visibility */}
-          <div className="glass-card rounded-3xl p-card-padding flex flex-col justify-between min-h-[160px]">
+          <div className="glass-card rounded-3xl p-4 md:p-card-padding flex flex-col justify-between min-h-[160px]">
             <div className="flex items-center gap-2 text-on-surface-variant">
               <span className="material-symbols-outlined text-sm">visibility</span>
               <span className="font-label-caps text-label-caps uppercase text-xs">Visibility</span>
             </div>
             <div className="space-y-1">
-              <p className="font-data-lg text-data-lg text-on-surface text-4xl font-bold">
+              <p className="font-data-lg text-data-lg text-on-surface text-3xl sm:text-4xl font-bold">
                 {current.visibility}
-                <span className="text-xl font-normal ml-1">mi</span>
+                <span className="text-lg sm:text-xl font-normal ml-0.5">mi</span>
               </p>
-              <p className="font-body-md text-on-surface-variant text-sm">{current.visibility_desc}</p>
+              <p className="font-body-md text-on-surface-variant text-xs sm:text-sm">{current.visibility_desc}</p>
             </div>
             <div className="w-full bg-white/10 h-1 rounded-full mt-2 overflow-hidden">
               <div 
@@ -304,7 +351,7 @@ export default function DashboardView() {
           </div>
 
           {/* Sunrise/Sunset */}
-          <div className="glass-card rounded-3xl p-card-padding flex flex-col justify-between min-h-[160px]">
+          <div className="glass-card rounded-3xl p-4 md:p-card-padding flex flex-col justify-between min-h-[160px]">
             <div className="flex items-center gap-2 text-on-surface-variant mb-2">
               <span className="material-symbols-outlined text-sm">wb_sunny</span>
               <span className="font-label-caps text-label-caps uppercase text-xs">Sunrise & Sunset</span>
@@ -327,9 +374,10 @@ export default function DashboardView() {
         </section>
       </div>
 
-      {/* Right Column: 7-Day Forecast */}
-      <div className="xl:col-span-4">
-        <section className="glass-card rounded-3xl p-card-padding h-full flex flex-col justify-between">
+      {/* Right Column: 7-Day Forecast & Outdoor Activities Planner */}
+      <div className="xl:col-span-4 flex flex-col gap-gutter">
+        {/* 7-Day Outlook */}
+        <section className="glass-card rounded-3xl p-4 md:p-card-padding flex flex-col justify-between">
           <div>
             <h4 className="font-label-caps text-label-caps uppercase text-on-surface-variant flex items-center gap-2 mb-6 text-xs font-bold tracking-wider">
               <span className="material-symbols-outlined text-sm">
@@ -353,13 +401,13 @@ export default function DashboardView() {
                     >
                       {item.icon}
                     </span>
-                    <div className="flex gap-4 items-center">
+                    <div className="flex gap-2 sm:gap-4 items-center">
                       <span className="font-body-md text-on-surface-variant min-w-[32px] text-right text-sm">
                         {item.min}°
                       </span>
                       
                       {/* Range slider representation */}
-                      <div className="w-24 h-1.5 bg-white/10 rounded-full relative overflow-hidden">
+                      <div className="w-12 sm:w-24 h-1.5 bg-white/10 rounded-full relative overflow-hidden">
                         <div 
                           className="absolute inset-y-0 bg-gradient-to-r from-tertiary to-primary rounded-full" 
                           style={{ 
@@ -388,6 +436,84 @@ export default function DashboardView() {
             Check Emergency Alerts
           </button>
         </section>
+
+        {/* Outdoor Activities Planner */}
+        {advice && (
+          <section className="glass-card rounded-3xl p-4 md:p-card-padding flex flex-col gap-6">
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-primary text-2xl">directions_run</span>
+              <h4 className="font-label-caps text-label-caps uppercase text-on-surface-variant text-xs font-bold tracking-wider">
+                Outdoor Activities Planner
+              </h4>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {/* Workout */}
+              <div className="flex items-start gap-4 p-3 rounded-2xl bg-white/5 border border-white/5">
+                <span className="material-symbols-outlined text-primary text-xl mt-1">fitness_center</span>
+                <div className="flex-grow space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-on-surface text-sm">Workouts & Cycling</span>
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${advice.workout.color}`}>
+                      {advice.workout.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    {advice.workout.text}
+                  </p>
+                </div>
+              </div>
+
+              {/* Gardening */}
+              <div className="flex items-start gap-4 p-3 rounded-2xl bg-white/5 border border-white/5">
+                <span className="material-symbols-outlined text-primary text-xl mt-1">yard</span>
+                <div className="flex-grow space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-on-surface text-sm">Gardening & Care</span>
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${advice.gardening.color}`}>
+                      {advice.gardening.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    {advice.gardening.text}
+                  </p>
+                </div>
+              </div>
+
+              {/* Dining */}
+              <div className="flex items-start gap-4 p-3 rounded-2xl bg-white/5 border border-white/5">
+                <span className="material-symbols-outlined text-primary text-xl mt-1">local_cafe</span>
+                <div className="flex-grow space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-on-surface text-sm">Picnics & Outdoor Dining</span>
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${advice.dining.color}`}>
+                      {advice.dining.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    {advice.dining.text}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stargazing */}
+              <div className="flex items-start gap-4 p-3 rounded-2xl bg-white/5 border border-white/5">
+                <span className="material-symbols-outlined text-primary text-xl mt-1">nights_stay</span>
+                <div className="flex-grow space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-on-surface text-sm">Stargazing & Sky Views</span>
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${advice.stargazing.color}`}>
+                      {advice.stargazing.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    {advice.stargazing.text}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

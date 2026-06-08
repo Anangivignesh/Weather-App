@@ -11,9 +11,12 @@ export default function LocationsView() {
     windUnit,
     setWindUnit,
     savedLocations,
+    addLocation,
     removeLocation,
     selectLocation,
-    setActiveTab
+    setActiveTab,
+    homeLocation,
+    setHomeLocation
   } = useWeather();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +29,29 @@ export default function LocationsView() {
 
   const [locationsWeather, setLocationsWeather] = useState({});
   const [loadingWeather, setLoadingWeather] = useState(false);
+
+  const getLocalTime = (timezoneOffset) => {
+    // timezoneOffset is in seconds
+    const utc = Date.now() + (timezoneOffset * 1000);
+    const date = new Date(utc);
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const displayHours = hours % 12 || 12;
+    const displayMinutes = String(minutes).padStart(2, "0");
+    return `${displayHours}:${displayMinutes} ${ampm}`;
+  };
+
+  const getMockOffset = (cityName) => {
+    const key = cityName.toLowerCase().trim();
+    if (key.includes("london")) return 3600;
+    if (key.includes("tokyo")) return 32400;
+    if (key.includes("paris")) return 7200;
+    if (key.includes("new york")) return -14400;
+    if (key.includes("portland")) return -25200;
+    if (key.includes("san francisco")) return -25200;
+    return -25200; // default to SF
+  };
 
   React.useEffect(() => {
     let active = true;
@@ -45,7 +71,7 @@ export default function LocationsView() {
                   icon: data.current.icon,
                   min: data.current.temp_min,
                   max: data.current.temp_max,
-                  time: data.current.sunrise ? "Local Weather" : "",
+                  time: getLocalTime(data.timezone_offset || 0),
                   country: data.country || loc.country || ""
                 };
               }
@@ -94,17 +120,18 @@ export default function LocationsView() {
   };
 
   const handleAddLocation = (loc) => {
-    // Already handles duplicates in context
-    selectLocation(loc);
+    addLocation(loc, false);
     setSearchQuery("");
     setSearchResults([]);
     setShowSearch(false);
-    setActiveTab("dashboard");
   };
 
   // Build temporary mock values for cards in locations list
   const getCityMockValues = (cityName) => {
     const key = cityName.toLowerCase().trim();
+    const offset = getMockOffset(cityName);
+    const localTimeStr = getLocalTime(offset);
+
     // Default fallback mock values if city isn't in default MOCK_CITIES
     const defaultVal = {
       temp: isCelsius ? 18 : 64,
@@ -112,7 +139,7 @@ export default function LocationsView() {
       icon: "partly_cloudy_day",
       min: isCelsius ? 14 : 57,
       max: isCelsius ? 22 : 72,
-      time: "10:24 AM",
+      time: localTimeStr,
       country: "US"
     };
 
@@ -123,7 +150,7 @@ export default function LocationsView() {
         icon: "cloud",
         min: isCelsius ? 11 : 52,
         max: isCelsius ? 16 : 61,
-        time: "6:24 PM",
+        time: localTimeStr,
         country: "UK"
       };
     }
@@ -134,7 +161,7 @@ export default function LocationsView() {
         icon: "sunny",
         min: isCelsius ? 18 : 64,
         max: isCelsius ? 24 : 75,
-        time: "2:24 AM",
+        time: localTimeStr,
         country: "JP"
       };
     }
@@ -145,7 +172,7 @@ export default function LocationsView() {
         icon: "cloudy_snowing",
         min: isCelsius ? 2 : 36,
         max: isCelsius ? 6 : 43,
-        time: "7:24 PM",
+        time: localTimeStr,
         country: "FR"
       };
     }
@@ -156,7 +183,7 @@ export default function LocationsView() {
         icon: "rainy",
         min: isCelsius ? 15 : 59,
         max: isCelsius ? 20 : 68,
-        time: "1:24 PM",
+        time: localTimeStr,
         country: "US"
       };
     }
@@ -167,7 +194,7 @@ export default function LocationsView() {
         icon: "thunderstorm",
         min: isCelsius ? 10 : 50,
         max: isCelsius ? 14 : 58,
-        time: "10:24 AM",
+        time: localTimeStr,
         country: "US"
       };
     }
@@ -178,7 +205,7 @@ export default function LocationsView() {
         icon: "cloud",
         min: isCelsius ? 16 : 61,
         max: isCelsius ? 22 : 72,
-        time: "10:24 AM",
+        time: localTimeStr,
         country: "US"
       };
     }
@@ -191,7 +218,7 @@ export default function LocationsView() {
       {/* Header Section */}
       <section className="flex justify-between items-start flex-col sm:flex-row gap-4 border-b border-white/5 pb-6">
         <div>
-          <h2 className="font-headline-lg text-headline-lg text-primary text-3xl font-bold mb-2">
+          <h2 className="font-headline-lg text-headline-lg text-primary text-2xl sm:text-3xl font-bold mb-2">
             Saved Locations & Preferences
           </h2>
           <p className="text-on-surface-variant font-body-md">
@@ -211,24 +238,48 @@ export default function LocationsView() {
                 className="glass-card p-card-padding rounded-2xl relative overflow-hidden group cursor-pointer flex flex-col justify-between min-h-[180px]"
                 onClick={() => handleSelectLocation(loc)}
               >
-                {/* Delete button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeLocation(loc.lat, loc.lon);
-                  }}
-                  className="absolute top-4 right-4 p-1 rounded-full bg-white/5 border border-white/10 text-on-surface-variant hover:text-error hover:bg-error/20 opacity-0 group-hover:opacity-100 transition-all z-20"
-                  title="Remove location"
-                >
-                  <span className="material-symbols-outlined text-sm">delete</span>
-                </button>
+                {/* Card actions (Delete / Set as Home) */}
+                <div className="absolute top-4 right-4 flex gap-2 z-20">
+                  {/* Home Status Badge / Button */}
+                  {loc.lat === homeLocation.lat && loc.lon === homeLocation.lon ? (
+                    <span 
+                      className="p-1 rounded-full bg-primary/20 border border-primary/40 text-primary flex items-center justify-center"
+                      title="Home Location"
+                    >
+                      <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setHomeLocation(loc);
+                      }}
+                      className="p-1 rounded-full bg-white/5 border border-white/10 text-on-surface-variant hover:text-primary hover:bg-primary/20 opacity-0 group-hover:opacity-100 transition-all"
+                      title="Set as Home"
+                    >
+                      <span className="material-symbols-outlined text-sm">home</span>
+                    </button>
+                  )}
 
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h3 className="font-headline-lg text-headline-lg-mobile text-xl font-bold text-on-surface">
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeLocation(loc.lat, loc.lon);
+                    }}
+                    className="p-1 rounded-full bg-white/5 border border-white/10 text-on-surface-variant hover:text-error hover:bg-error/20 opacity-0 group-hover:opacity-100 transition-all"
+                    title="Remove location"
+                  >
+                    <span className="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                </div>
+
+                <div className="flex justify-between items-start mb-6 gap-2 min-w-0 w-full">
+                  <div className="min-w-0 flex-grow">
+                    <h3 className="font-headline-lg text-headline-lg-mobile text-xl font-bold text-on-surface break-words">
                       {loc.name}
                     </h3>
-                    <p className="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">
+                    <p className="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1 truncate">
                       {loc.country || "US"} • {mock.time}
                     </p>
                   </div>

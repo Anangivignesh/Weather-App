@@ -26,6 +26,7 @@ export default function Header() {
     setSearchQuery("");
     setShowDropdown(false);
     setActiveTab("dashboard");
+    window.location.reload();
   };
 
   const handleKeyDown = (e) => {
@@ -35,10 +36,10 @@ export default function Header() {
   };
 
   return (
-    <header className="flex justify-between items-center w-full px-container-margin py-4 sticky top-0 z-50 bg-surface/10 backdrop-blur-3xl border-b border-white/20">
-      <div className="flex items-center gap-6">
+    <header className="flex justify-between items-center w-full px-4 md:px-container-margin py-4 sticky top-0 z-50 bg-surface/10 backdrop-blur-3xl border-b border-white/20">
+      <div className="flex items-center gap-2 md:gap-6 shrink-0">
         <div 
-          className="flex items-center gap-base cursor-pointer" 
+          className="flex items-center gap-1.5 md:gap-base cursor-pointer" 
           onClick={() => setActiveTab("dashboard")}
         >
           <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -94,7 +95,7 @@ export default function Header() {
         </nav>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         {/* Search Input */}
         <div className="relative flex items-center">
           <span className="material-symbols-outlined absolute left-3 text-on-surface-variant text-sm pointer-events-none">
@@ -108,12 +109,12 @@ export default function Header() {
             onKeyDown={handleKeyDown}
             onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
             onFocus={() => searchQuery.trim().length > 1 && setShowDropdown(true)}
-            className="bg-[var(--surface-container-low)] border border-[var(--outline-variant)] rounded-full py-1.5 pl-10 pr-4 text-sm text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--primary)] focus:bg-[var(--surface-container-high)] transition-all duration-300 w-36 sm:w-48 lg:w-64"
+            className="bg-[var(--surface-container-low)] border border-[var(--outline-variant)] rounded-full py-1.5 pl-10 pr-4 text-sm text-[var(--on-surface)] placeholder:text-[var(--on-surface-variant)] focus:outline-none focus:border-[var(--primary)] focus:bg-[var(--surface-container-high)] transition-all duration-300 w-28 sm:w-48 lg:w-64"
           />
 
           {/* Search Dropdown */}
           {showDropdown && searchResults.length > 0 && (
-            <div className="absolute top-12 left-0 right-0 bg-[var(--surface-container-high)] border border-[var(--outline-variant)] rounded-2xl p-2 z-50 shadow-2xl max-h-60 overflow-y-auto">
+            <div className="absolute top-12 right-0 w-56 sm:w-72 md:w-full bg-[var(--surface-container-high)] border border-[var(--outline-variant)] rounded-2xl p-2 z-50 shadow-2xl max-h-60 overflow-y-auto">
               {searchResults.map((result, idx) => (
                 <div
                   key={idx}

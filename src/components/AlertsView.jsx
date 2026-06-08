@@ -22,9 +22,9 @@ function AlertCountdown({ initialSeconds }) {
   };
 
   return (
-    <div className="flex flex-col text-right">
+    <div className="flex flex-col md:text-right text-left md:items-end items-start mt-2 md:mt-0 shrink-0">
       <span className="font-label-caps text-label-caps text-on-surface-variant text-[10px] tracking-wider uppercase">Expires In</span>
-      <span className="font-data-lg text-data-lg text-on-surface text-3xl font-bold font-mono tracking-tight mt-0.5">
+      <span className="font-data-lg text-data-lg text-on-surface text-2xl sm:text-3xl font-bold font-mono tracking-tight mt-0.5">
         {formatTime()}
       </span>
     </div>
@@ -32,19 +32,26 @@ function AlertCountdown({ initialSeconds }) {
 }
 
 export default function AlertsView() {
-  const { detailedAlerts, activeLocation, weatherData, setActiveTab, isCelsius } = useWeather();
-  const [checklist, setChecklist] = useState([]);
+  const {
+    detailedAlerts,
+    homeLocation,
+    homeWeatherData,
+    checklistState,
+    setChecklistState,
+    setActiveTab,
+    isCelsius
+  } = useWeather();
   const [broadcasted, setBroadcasted] = useState(false);
 
-  // Generate dynamic alerts based on weatherData when not in live mode
+  // Generate dynamic alerts based on homeWeatherData
   const getDynamicAlerts = () => {
-    if (!weatherData) return [];
+    if (!homeWeatherData) return [];
 
-    const cityName = weatherData.name || activeLocation?.name || "your area";
-    const condition = (weatherData.current?.condition || "").toLowerCase();
-    const temp = weatherData.current?.temp || 0;
-    const windSpeed = weatherData.current?.wind_speed || 0;
-    const uvIndex = weatherData.current?.uv_index || 0;
+    const cityName = homeWeatherData.name || homeLocation?.name || "your area";
+    const condition = (homeWeatherData.current?.condition || "").toLowerCase();
+    const temp = homeWeatherData.current?.temp || 0;
+    const windSpeed = homeWeatherData.current?.wind_speed || 0;
+    const uvIndex = homeWeatherData.current?.uv_index || 0;
 
     const alerts = [];
 
@@ -85,7 +92,7 @@ export default function AlertsView() {
         event: "Flash Flood Warning",
         severity: "SEVERE WARNING",
         end: Math.floor(Date.now() / 1000) + 7940,
-        description: `Excessive runoff from heavy rainfall (${weatherData.current?.description || "storms"}) will cause flooding of small creeks, urban areas, highways, and low-lying spots. Turn around, don't drown!`,
+        description: `Excessive runoff from heavy rainfall (${homeWeatherData.current?.description || "storms"}) will cause flooding of small creeks, urban areas, highways, and low-lying spots. Turn around, don't drown!`,
         affected_areas: [cityName, `${cityName} Lowlands`, "Drainage Basins"]
       });
       alerts.push({
@@ -114,7 +121,7 @@ export default function AlertsView() {
         event: "Urban Flood Advisory",
         severity: "ADVISORY",
         end: Math.floor(Date.now() / 1000) + 10800,
-        description: `Ponding of water on roadways and minor flooding in low-lying areas is expected due to continuous ${weatherData.current?.description || "moderate rain"}. Drive with extreme care.`,
+        description: `Ponding of water on roadways and minor flooding in low-lying areas is expected due to continuous ${homeWeatherData.current?.description || "moderate rain"}. Drive with extreme care.`,
         affected_areas: [cityName, `${cityName} Metro`]
       });
       alerts.push({
@@ -163,54 +170,54 @@ export default function AlertsView() {
         event: "Climatic Outlook Note",
         severity: "INFORMATION",
         end: Math.floor(Date.now() / 1000) + 16000,
-        description: `Pleasant weather conditions with light winds and moderate humidity of ${weatherData?.current?.humidity || 50}% expected to persist for the next 48 hours.`
+        description: `Pleasant weather conditions with light winds and moderate humidity of ${homeWeatherData?.current?.humidity || 50}% expected to persist for the next 48 hours.`
       });
     }
 
     return alerts;
   };
 
-  // Generate dynamic checklist template based on weatherData
+  // Generate dynamic checklist template based on homeWeatherData (all unticked by default)
   const getChecklistTemplate = () => {
-    if (!weatherData) return [];
-    const condition = (weatherData.current?.condition || "").toLowerCase();
-    const temp = weatherData.current?.temp || 0;
-    const windSpeed = weatherData.current?.wind_speed || 0;
-    const uvIndex = weatherData.current?.uv_index || 0;
+    if (!homeWeatherData) return [];
+    const condition = (homeWeatherData.current?.condition || "").toLowerCase();
+    const temp = homeWeatherData.current?.temp || 0;
+    const windSpeed = homeWeatherData.current?.wind_speed || 0;
+    const uvIndex = homeWeatherData.current?.uv_index || 0;
 
     if (condition.includes("snow") || condition.includes("freeze") || (isCelsius ? temp <= 5 : temp <= 41)) {
       return [
         { text: "Drip water faucets to prevent pipe freezing", checked: false },
-        { text: "Check heating systems and fuel supplies", checked: true },
+        { text: "Check heating systems and fuel supplies", checked: false },
         { text: "Wrap outdoor exposed pipes and hose bibbs", checked: false },
         { text: "Ensure vehicle winter emergency kit is stocked", checked: false }
       ];
     } else if (condition.includes("storm") || condition.includes("thunderstorm") || windSpeed >= 20) {
       return [
-        { text: "Ensure backup batteries are fully charged", checked: true },
+        { text: "Ensure backup batteries are fully charged", checked: false },
         { text: "Secure patio furniture, trash bins, and outdoor items", checked: false },
         { text: "Clear leaves and debris from storm drains", checked: false },
-        { text: "Ensure sump pump and backup power are operational", checked: true }
+        { text: "Ensure sump pump and backup power are operational", checked: false }
       ];
     } else if (condition.includes("rain") || condition.includes("drizzle") || condition.includes("shower")) {
       return [
-        { text: "Check vehicle windshield wipers", checked: true },
+        { text: "Check vehicle windshield wipers", checked: false },
         { text: "Clear gutters of any blockages", checked: false },
-        { text: "Keep umbrellas and wet-weather gear by the door", checked: true },
+        { text: "Keep umbrellas and wet-weather gear by the door", checked: false },
         { text: "Avoid walking or driving through standing water", checked: false }
       ];
     } else if (uvIndex >= 6 || (isCelsius ? temp >= 25 : temp >= 77)) {
       return [
         { text: "Limit direct sunlight exposure during peak hours", checked: false },
-        { text: "Drink plenty of water and maintain hydration", checked: true },
+        { text: "Drink plenty of water and maintain hydration", checked: false },
         { text: "Apply SPF 30+ sunscreen before going outdoors", checked: false },
-        { text: "Ensure pets have adequate shade and fresh water", checked: true }
+        { text: "Ensure pets have adequate shade and fresh water", checked: false }
       ];
     } else {
       return [
-        { text: "Review home emergency evacuation routes", checked: true },
+        { text: "Review home emergency evacuation routes", checked: false },
         { text: "Check expiry dates in your first aid kit", checked: false },
-        { text: "Inspect smoke and carbon monoxide detectors", checked: true },
+        { text: "Inspect smoke and carbon monoxide detectors", checked: false },
         { text: "Ensure vehicle tire pressures are at correct levels", checked: false }
       ];
     }
@@ -218,11 +225,11 @@ export default function AlertsView() {
 
   // Generate dynamic evacuation routes
   const getEvacuationRoutes = () => {
-    if (!weatherData) return [];
-    const condition = (weatherData.current?.condition || "").toLowerCase();
-    const temp = weatherData.current?.temp || 0;
-    const windSpeed = weatherData.current?.wind_speed || 0;
-    const uvIndex = weatherData.current?.uv_index || 0;
+    if (!homeWeatherData) return [];
+    const condition = (homeWeatherData.current?.condition || "").toLowerCase();
+    const temp = homeWeatherData.current?.temp || 0;
+    const windSpeed = homeWeatherData.current?.wind_speed || 0;
+    const uvIndex = homeWeatherData.current?.uv_index || 0;
 
     if (condition.includes("snow") || condition.includes("freeze") || (isCelsius ? temp <= 5 : temp <= 41)) {
       return [
@@ -252,14 +259,26 @@ export default function AlertsView() {
     }
   };
 
-  useEffect(() => {
-    setChecklist(getChecklistTemplate());
-  }, [weatherData?.name]);
+  const locationKey = homeLocation ? `${homeLocation.lat}-${homeLocation.lon}` : "";
+  const template = getChecklistTemplate();
+  const savedChecks = checklistState[locationKey] || {};
 
-  const toggleCheck = (idx) => {
-    setChecklist(prev =>
-      prev.map((item, i) => (i === idx ? { ...item, checked: !item.checked } : item))
-    );
+  const checklist = template.map(item => ({
+    ...item,
+    checked: savedChecks[item.text] !== undefined ? savedChecks[item.text] : item.checked
+  }));
+
+  const toggleCheck = (itemText) => {
+    if (!locationKey) return;
+    const currentStatus = savedChecks[itemText] !== undefined ? savedChecks[itemText] : template.find(item => item.text === itemText)?.checked || false;
+    
+    setChecklistState(prev => ({
+      ...prev,
+      [locationKey]: {
+        ...(prev[locationKey] || {}),
+        [itemText]: !currentStatus
+      }
+    }));
   };
 
   const hasLocalAlerts = detailedAlerts.length > 0;
@@ -295,14 +314,9 @@ export default function AlertsView() {
         <div>
           <h1 className="font-headline-lg text-primary text-3xl font-bold mb-2">Severe Alerts</h1>
           <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl">
-            Real-time hazardous weather notifications and emergency guidance for your current vicinity and saved locations.
+            Real-time hazardous weather notifications and emergency guidance for your home location ({homeLocation?.name || "your area"}).
           </p>
         </div>
-        {!hasLocalAlerts && (
-          <div className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-bold">
-            Demo Mode (Simulating alerts for {weatherData?.name || activeLocation?.name})
-          </div>
-        )}
       </section>
 
       {/* Active Alerts Grid */}
@@ -393,7 +407,7 @@ export default function AlertsView() {
             <div className="text-center space-y-2">
               <span className="material-symbols-outlined text-5xl text-green-400">check_circle</span>
               <h3 className="text-xl font-bold text-on-surface">No Active Warnings</h3>
-              <p className="text-sm text-on-surface-variant max-w-sm">There are no severe weather hazards reported in your immediate coordinates.</p>
+              <p className="text-sm text-on-surface-variant max-w-sm">There are no severe weather hazards reported in {homeLocation?.name || "your home location"}.</p>
             </div>
           </div>
         )}
@@ -510,7 +524,7 @@ export default function AlertsView() {
                 <li 
                   key={idx} 
                   className={`flex items-start gap-3 cursor-pointer transition-opacity ${item.checked ? "" : "opacity-60"}`}
-                  onClick={() => toggleCheck(idx)}
+                  onClick={() => toggleCheck(item.text)}
                 >
                   <span className={`material-symbols-outlined text-lg ${item.checked ? "text-primary-fixed-dim" : "text-on-surface-variant"}`}>
                     {item.checked ? "check_circle" : "radio_button_unchecked"}

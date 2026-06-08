@@ -35,15 +35,28 @@ export const WeatherProvider = ({ children }) => {
     return val !== null ? JSON.parse(val) : { name: "San Francisco", lat: 37.7749, lon: -122.4194, country: "US", state: "CA" };
   });
 
+  // Home Location (Default to San Francisco)
+  const [homeLocation, setHomeLocation] = useState(() => {
+    const val = localStorage.getItem("weather_home_location");
+    return val !== null ? JSON.parse(val) : { name: "San Francisco", lat: 37.7749, lon: -122.4194, country: "US", state: "CA" };
+  });
+
   const [weatherData, setWeatherData] = useState(null);
+  const [homeWeatherData, setHomeWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Active View Tab: 'dashboard', 'map', 'alerts', 'locations'
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem("weather_active_tab") || "dashboard");
 
   // Detailed Severe Alert Context
   const [detailedAlerts, setDetailedAlerts] = useState([]);
+
+  // Safety Checklist Persistent State
+  const [checklistState, setChecklistState] = useState(() => {
+    const val = localStorage.getItem("weather_checklist_state");
+    return val !== null ? JSON.parse(val) : {};
+  });
 
   // Persist config adjustments
   useEffect(() => {
@@ -66,12 +79,25 @@ export const WeatherProvider = ({ children }) => {
     localStorage.setItem("weather_active_location", JSON.stringify(activeLocation));
   }, [activeLocation]);
 
+  useEffect(() => {
+    localStorage.setItem("weather_home_location", JSON.stringify(homeLocation));
+  }, [homeLocation]);
+
+  useEffect(() => {
+    localStorage.setItem("weather_checklist_state", JSON.stringify(checklistState));
+  }, [checklistState]);
+
+  useEffect(() => {
+    localStorage.setItem("weather_active_tab", activeTab);
+  }, [activeTab]);
+
   // Load weather when coords or units change
   useEffect(() => {
     const loadWeather = async () => {
       setLoading(true);
       setError(null);
       try {
+        // Load active weather
         const data = await getWeatherData(activeLocation.lat, activeLocation.lon, apiKey, isCelsius);
         
         // Fix city discrepancy glitch: ensure weatherData name info matches the activeLocation
@@ -83,14 +109,29 @@ export const WeatherProvider = ({ children }) => {
 
         setWeatherData(data);
 
-        // Fetch detailed alerts if any
-        if (data && data.current.alerts && data.current.alerts.length > 0) {
-          const alertPromises = data.current.alerts.map(id => getAlertDetails(id, apiKey));
+        // Load home weather (avoid duplicate calls if they are the same location)
+        let homeData = null;
+        if (activeLocation.lat === homeLocation.lat && activeLocation.lon === homeLocation.lon) {
+          homeData = data;
+        } else {
+          homeData = await getWeatherData(homeLocation.lat, homeLocation.lon, apiKey, isCelsius);
+          if (homeData && homeLocation) {
+            homeData.name = homeLocation.name;
+            if (homeLocation.state !== undefined) homeData.state = homeLocation.state;
+            if (homeLocation.country !== undefined) homeData.country = homeLocation.country;
+          }
+        }
+        setHomeWeatherData(homeData);
+
+        // Fetch detailed alerts for home location if any
+        if (homeData && homeData.current.alerts && homeData.current.alerts.length > 0) {
+          const alertPromises = homeData.current.alerts.map(id => getAlertDetails(id, apiKey));
           const alertDetails = await Promise.all(alertPromises);
           setDetailedAlerts(alertDetails);
         } else {
           setDetailedAlerts([]);
         }
+
       } catch (err) {
         console.error(err);
         setError("Could not retrieve weather data. Check your connection or API key.");
@@ -100,7 +141,7 @@ export const WeatherProvider = ({ children }) => {
     };
 
     loadWeather();
-  }, [activeLocation, apiKey, isCelsius]);
+  }, [activeLocation, homeLocation, apiKey, isCelsius]);
 
   // Toggle day/light and night/dark themes on html root element
   useEffect(() => {
@@ -115,7 +156,7 @@ export const WeatherProvider = ({ children }) => {
   }, [weatherData]);
 
   // Actions
-  const addLocation = (loc) => {
+  const addLocation = (loc, selectAfterAdd = true) => {
     // Prevent duplicate entries
     const exists = savedLocations.some(
       l => Math.abs(l.lat - loc.lat) < 0.05 && Math.abs(l.lon - loc.lon) < 0.05
@@ -123,11 +164,22 @@ export const WeatherProvider = ({ children }) => {
     if (!exists) {
       setSavedLocations(prev => [...prev, loc]);
     }
-    setActiveLocation(loc);
+    if (selectAfterAdd) {
+      setActiveLocation(loc);
+    }
   };
 
   const removeLocation = (lat, lon) => {
     setSavedLocations(prev => prev.filter(l => l.lat !== lat || l.lon !== lon));
+    
+    // Also remove home status if removed
+    if (homeLocation.lat === lat && homeLocation.lon === lon) {
+      const remaining = savedLocations.filter(l => l.lat !== lat || l.lon !== lon);
+      if (remaining.length > 0) {
+        setHomeLocation(remaining[0]);
+      }
+    }
+
     // If deleted the active one, switch to first available
     if (activeLocation.lat === lat && activeLocation.lon === lon) {
       const remaining = savedLocations.filter(l => l.lat !== lat || l.lon !== lon);
@@ -177,7 +229,12 @@ export const WeatherProvider = ({ children }) => {
         removeLocation,
         activeLocation,
         selectLocation,
+        homeLocation,
+        setHomeLocation,
         weatherData,
+        homeWeatherData,
+        checklistState,
+        setChecklistState,
         detailedAlerts,
         loading,
         error,

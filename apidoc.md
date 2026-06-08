@@ -3224,3 +3224,9 @@ Source and documentation (README.md) is available on GitHub https://github.com/b
 Example of weather map: https://github.com/owm-inc/VANE-intro/tree/master/apps
 
 Using OpenWeatherMap weather tiles with leaflet: PDF
+
+the safety checklist is not working make sure it is working and its status to be actively stored similar to the currently searched location, 
+
+add a option to set the location as home similar to the delete option that arise when the mouse hovers on a location in the location page, the home location that is set as home on the location page will be selected as home location which will be used as primary location to fetch data and summary for the alerts page, the alerts page sections should be very static and bound to the data of the primary home location, the data displayed on the alerts page should not be static or demo it should be dynamic. ask me any questions to perfect this combination.
+
+after the refreshing it is going back to dashboard so it should know its state on which page it is currently on so the page after refresh should not revert back to the dashboard page and there is very much empty space present below on the 7 day outlook section on the dashboard page as specified in the image attached remove the remove it to add a feature on the empty space adding a new section, in the locations page while adding a new location the search button should work independently apart from the main search option and when a location is selected in it, it should directly add the locations in the available locations, the entire website should only be refreshed only when a user initiates the refresh externally and when the new location is searched.

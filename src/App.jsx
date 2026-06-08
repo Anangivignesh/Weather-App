@@ -49,7 +49,7 @@ function WeatherAppContent() {
       <Header />
       
       {/* Main Content Canvas */}
-      <main className="flex-grow p-container-margin py-8">
+      <main className="flex-grow px-4 py-6 md:p-container-margin md:py-8">
         {renderActiveView()}
       </main>
 
@@ -63,7 +63,7 @@ function WeatherAppContent() {
             © 2026 Weather Dashboard. Live data powered by OpenWeather One Call API 4.0.
           </p>
         </div>
-        <div className="flex gap-6 text-xs font-semibold">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-semibold">
           <a href="#" className="hover:text-primary transition-colors hover:underline decoration-primary/50">Terms of Service</a>
           <a href="#" className="hover:text-primary transition-colors hover:underline decoration-primary/50">Privacy Policy</a>
           <a href="#" className="hover:text-primary transition-colors hover:underline decoration-primary/50">Data Sources</a>
@@ -97,8 +97,8 @@ function WeatherAppContent() {
           onClick={() => setActiveTab("locations")}
           className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "locations" ? "text-primary" : "text-on-surface-variant"}`}
         >
-          <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: activeTab === "locations" ? "'FILL' 1" : "'FILL' 0" }}>settings</span>
-          <span className="text-[9px] uppercase font-bold tracking-wider">Settings</span>
+          <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: activeTab === "locations" ? "'FILL' 1" : "'FILL' 0" }}>location_on</span>
+          <span className="text-[9px] uppercase font-bold tracking-wider">Locations</span>
         </button>
       </div>
     </div>
